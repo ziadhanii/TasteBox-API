@@ -1,0 +1,6 @@
+@TasteBox_HostAddress = http://localhost:5269
+
+GET {{TasteBox_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
