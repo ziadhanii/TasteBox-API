@@ -6,8 +6,35 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddControllers();
+
+
         services
-            .AddSwaggerServices();
+            .AddinfrastructureServices(configuration)
+            .AddSwaggerServices()
+            .AddMapsterConfig()
+            .AddFluentValidationConfig();
+
+
+        services.AddScoped<ICategoryServices, CategoryServices>();
+
+
+        return services;
+    }
+
+    // Infrastructure
+    private static IServiceCollection AddinfrastructureServices(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
+                               throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseSqlServer(connectionString);
+
+            // options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+        });
+
 
         return services;
     }
@@ -43,6 +70,25 @@ public static class DependencyInjection
                     [new OpenApiSecuritySchemeReference("bearer", document)] = []
                 });
         });
+        return services;
+    }
+
+    private static IServiceCollection AddFluentValidationConfig(this IServiceCollection services)
+    {
+        services
+            .AddFluentValidationAutoValidation()
+            .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+        return services;
+    }
+
+    private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
+    {
+        var mappingConfig = TypeAdapterConfig.GlobalSettings;
+        mappingConfig.Scan(Assembly.GetExecutingAssembly());
+
+        services.AddSingleton<IMapper>(new Mapper(mappingConfig));
+
         return services;
     }
 }

@@ -1,2 +1,15 @@
 global using Microsoft.OpenApi;
 global using TasteBox;
+global using Microsoft.EntityFrameworkCore;
+global using TasteBox.Persistence;
+global using System.Reflection;
+global using FluentValidation;
+global using FluentValidation.AspNetCore;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using TasteBox.Entities;
+global using Mapster;
+global using MapsterMapper;
+global using TasteBox.Interfaces;
+global using TasteBox.Services;
+global using Microsoft.AspNetCore.Mvc;
+global using TasteBox.Contracts.Category;
