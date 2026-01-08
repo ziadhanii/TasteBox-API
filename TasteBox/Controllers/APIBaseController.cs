@@ -1,5 +1,5 @@
 namespace TasteBox.Controllers;
 
 [ApiController]
-[Route("v1/api/[controller]")]
+[Route("api/v1/[controller]")]
 public class APIBaseController : ControllerBase { }

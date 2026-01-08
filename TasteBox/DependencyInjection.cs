@@ -1,3 +1,6 @@
+using TasteBox.Errors;
+using TasteBox.Utilities.File;
+
 namespace TasteBox;
 
 public static class DependencyInjection
@@ -5,8 +8,8 @@ public static class DependencyInjection
     public static IServiceCollection AddDependencies(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddRouting(options => { options.LowercaseUrls = true; });
         services.AddControllers();
-
 
         services
             .AddinfrastructureServices(configuration)
@@ -14,8 +17,12 @@ public static class DependencyInjection
             .AddMapsterConfig()
             .AddFluentValidationConfig();
 
-
+        services.AddHttpContextAccessor();
         services.AddScoped<ICategoryServices, CategoryServices>();
+        services.AddScoped<IFileService, FileService>();
+
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
 
 
         return services;
