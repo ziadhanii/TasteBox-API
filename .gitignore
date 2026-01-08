@@ -11,3 +11,7 @@ riderModule.iml
 .vs
 .idea
 .github
+
+appsettings.json
+
+.config

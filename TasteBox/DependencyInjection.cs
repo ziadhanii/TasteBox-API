@@ -18,7 +18,8 @@ public static class DependencyInjection
             .AddFluentValidationConfig();
 
         services.AddHttpContextAccessor();
-        services.AddScoped<ICategoryServices, CategoryServices>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IFileService, FileService>();
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -51,6 +52,10 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            options.IncludeXmlComments(xmlPath);
+
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "TasteBox-App-API",
@@ -60,7 +65,7 @@ public static class DependencyInjection
                     Name = "TasteBox-App-API",
                     Url = new Uri("https://github.com/ziadhanii/TasteBox"),
                     Email = "ziadhani64@gmail.com"
-                },
+                }
             });
 
             options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme

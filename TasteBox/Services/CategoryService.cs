@@ -5,7 +5,7 @@ using TasteBox.Utilities.File;
 
 namespace TasteBox.Services;
 
-public class CategoryServices(ApplicationDbContext context, IFileService fileService) : ICategoryServices
+public class CategoryService(ApplicationDbContext context, IFileService fileService) : ICategoryService
 {
     public async Task<IEnumerable<CategoryResponse>> GetAllAsync(CancellationToken cancellationToken = default)
         => await context.Categories
@@ -13,14 +13,20 @@ public class CategoryServices(ApplicationDbContext context, IFileService fileSer
             .ProjectToType<CategoryResponse>()
             .ToListAsync(cancellationToken);
 
-    public async Task<Result<CategoryResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Result<CategoryWithProductsResponse>> GetAsync(
+        int id,
+        CancellationToken cancellationToken = default)
     {
-        var category = await context.Categories.FindAsync(id, cancellationToken);
+        var category = await context.Categories
+            .Where(c => c.Id == id)
+            .ProjectToType<CategoryWithProductsResponse>()
+            .FirstOrDefaultAsync(cancellationToken);
 
         return category is not null
-            ? Result.Success(category.Adapt<CategoryResponse>())
-            : Result.Failure<CategoryResponse>(CategoryErrors.CategoryNotFound);
+            ? Result.Success(category)
+            : Result.Failure<CategoryWithProductsResponse>(CategoryErrors.CategoryNotFound);
     }
+
 
     public async Task<Result<CategoryResponse>> AddAsync(CreateCategoryRequest request,
         CancellationToken cancellationToken = default)
