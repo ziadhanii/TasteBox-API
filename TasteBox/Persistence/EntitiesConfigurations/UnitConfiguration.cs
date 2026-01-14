@@ -10,6 +10,12 @@ public class UnitConfiguration : IEntityTypeConfiguration<Unit>
 
         builder.Property(u => u.Symbol)
             .IsRequired()
-            .HasMaxLength(20);
+            .HasMaxLength(10);
+
+        builder.HasIndex(u => u.Name)
+            .IsUnique();
+
+        builder.HasIndex(u => u.Symbol)
+            .IsUnique();
     }
 }

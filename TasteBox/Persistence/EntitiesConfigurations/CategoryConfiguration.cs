@@ -10,6 +10,10 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .IsRequired()
             .HasMaxLength(40);
 
+        builder.Property(c => c.ImageUrl)
+            .IsRequired()
+            .HasMaxLength(500);
+
         builder.HasIndex(c => c.Name)
             .IsUnique()
             .HasFilter($"[{nameof(ISoftDelete.IsDeleted)}] = 0");

@@ -1,16 +1,16 @@
 namespace TasteBox.Contracts.Product;
 
-public record ProductResponse(
-    int Id,
+public record CreateProductRequest(
     string Name,
     string Description,
-    string ImageUrl,
+    IFormFile ImageFile,
     bool IsWeighedProduct,
+    decimal InitialQuantity,
+    decimal MinQuantityForStockAlerts,
+    decimal CostPrice,
     decimal UnitPrice,
     decimal? DiscountedPrice,
     decimal MinOrderQty,
     decimal MaxOrderQty,
-    string UnitName,
-    string UnitSymbol,
-    decimal QuantityInStock
+    int UnitId
 );

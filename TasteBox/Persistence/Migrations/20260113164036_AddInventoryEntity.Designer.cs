@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TasteBox.Persistence;
 
@@ -11,9 +12,11 @@ using TasteBox.Persistence;
 namespace TasteBox.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260113164036_AddInventoryEntity")]
+    partial class AddInventoryEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,6 +57,57 @@ namespace TasteBox.Persistence.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("TasteBox.Entities.Inventory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastRestocked")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("LowStockThreshold")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ReorderPoint")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ReorderQuantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ReservedQuantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId")
+                        .IsUnique();
+
+                    b.ToTable("Inventories");
+                });
+
             modelBuilder.Entity("TasteBox.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -62,10 +116,21 @@ namespace TasteBox.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Barcode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("BaseQuantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("CostPrice")
+                    b.Property<decimal?>("ComparePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("CostPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -76,10 +141,6 @@ namespace TasteBox.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal?>("DiscountedPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -104,12 +165,16 @@ namespace TasteBox.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
+                    b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SKU")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UnitId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -120,36 +185,6 @@ namespace TasteBox.Persistence.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("TasteBox.Entities.Stock", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("MinQuantity")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId")
-                        .IsUnique();
-
-                    b.ToTable("Stock");
-                });
-
             modelBuilder.Entity("TasteBox.Entities.Unit", b =>
                 {
                     b.Property<int>("Id")
@@ -158,11 +193,7 @@ namespace TasteBox.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("ConversionFactorToBaseUnit")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsBaseUnit")
+                    b.Property<bool>("HasStock")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -178,6 +209,17 @@ namespace TasteBox.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Units");
+                });
+
+            modelBuilder.Entity("TasteBox.Entities.Inventory", b =>
+                {
+                    b.HasOne("TasteBox.Entities.Product", "Product")
+                        .WithOne("Inventory")
+                        .HasForeignKey("TasteBox.Entities.Inventory", "ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("TasteBox.Entities.Product", b =>
@@ -197,17 +239,6 @@ namespace TasteBox.Persistence.Migrations
                     b.Navigation("Unit");
                 });
 
-            modelBuilder.Entity("TasteBox.Entities.Stock", b =>
-                {
-                    b.HasOne("TasteBox.Entities.Product", "Product")
-                        .WithOne("Stock")
-                        .HasForeignKey("TasteBox.Entities.Stock", "ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("TasteBox.Entities.Category", b =>
                 {
                     b.Navigation("Products");
@@ -215,7 +246,7 @@ namespace TasteBox.Persistence.Migrations
 
             modelBuilder.Entity("TasteBox.Entities.Product", b =>
                 {
-                    b.Navigation("Stock")
+                    b.Navigation("Inventory")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

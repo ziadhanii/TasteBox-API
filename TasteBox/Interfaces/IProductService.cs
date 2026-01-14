@@ -13,4 +13,21 @@ public interface IProductService
 
     Task<Result<ProductResponse>> GetByIdAsync(int categoryId, int id,
         CancellationToken cancellationToken = default);
+
+    Task<Result<ProductResponse>> CreateProductAsync(
+        int categoryId,
+        CreateProductRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result> UpdateProductAsync(
+        int categoryId,
+        int id,
+        UpdateProductRequest request,
+        CancellationToken cancellationToken = default);
+
+    // TOGGLE STATUS SOFT DELETE
+    Task<Result> ToggleProductStatusAsync(
+        int categoryId,
+        int id,
+        CancellationToken cancellationToken = default);
 }

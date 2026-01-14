@@ -13,5 +13,11 @@ riderModule.iml
 .github
 
 appsettings.json
+.appsettings.json
+
+wwwroot/
+uploads/
+PublishProfiles/
+
 
 .config

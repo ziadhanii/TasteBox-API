@@ -2,5 +2,6 @@ namespace TasteBox.Utilities;
 
 public enum UploadDirectory
 {
-    Categories
+    Categories,
+    Products
 }

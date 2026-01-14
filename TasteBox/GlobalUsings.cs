@@ -13,3 +13,6 @@ global using TasteBox.Interfaces;
 global using TasteBox.Services;
 global using Microsoft.AspNetCore.Mvc;
 global using TasteBox.Contracts.Category;
+global using Scalar.AspNetCore;
+global using TasteBox.Utilities;
+global using TasteBox.Extensions;

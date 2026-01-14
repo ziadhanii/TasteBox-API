@@ -18,6 +18,8 @@ public static class DependencyInjection
             .AddFluentValidationConfig();
 
         services.AddHttpContextAccessor();
+
+        services.AddScoped<IStockService, StockService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IFileService, FileService>();
@@ -40,6 +42,8 @@ public static class DependencyInjection
         {
             options.UseSqlServer(connectionString);
 
+            options.EnableSensitiveDataLogging();
+            options.LogTo(Console.WriteLine);
             // options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
 
@@ -56,13 +60,25 @@ public static class DependencyInjection
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             options.IncludeXmlComments(xmlPath);
 
-            options.SwaggerDoc("v1", new OpenApiInfo
+            options.SwaggerDoc("dashboard", new OpenApiInfo
             {
-                Title = "TasteBox-App-API",
+                Title = "TasteBox-Dashboard-API",
                 Version = "v1",
                 Contact = new OpenApiContact
                 {
-                    Name = "TasteBox-App-API",
+                    Name = "TasteBox-Dashboard-API",
+                    Url = new Uri("https://github.com/ziadhanii/TasteBox"),
+                    Email = "ziadhani64@gmail.com"
+                }
+            });
+
+            options.SwaggerDoc("mobile", new OpenApiInfo
+            {
+                Title = "TasteBox Mobile API",
+                Version = "v1",
+                Contact = new OpenApiContact
+                {
+                    Name = "TasteBox-Mobile-API",
                     Url = new Uri("https://github.com/ziadhanii/TasteBox"),
                     Email = "ziadhani64@gmail.com"
                 }
