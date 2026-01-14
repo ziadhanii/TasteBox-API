@@ -11,15 +11,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Description)
             .HasMaxLength(500);
 
-        builder.Property(p => p.ImageUrl)
+        builder.Property(c => c.ImageUrl)
             .IsRequired()
-            .HasMaxLength(500);
-
-        builder.Property(p => p.PricePerBaseQuantity)
-            .HasPrecision(18, 2);
-
-        builder.Property(p => p.BaseQuantity)
-            .HasPrecision(18, 3);
+            .HasMaxLength(100);
 
         builder.HasOne<Category>()
             .WithMany(c => c.Products)
@@ -29,7 +23,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .WithMany()
             .HasForeignKey(p => p.UnitId);
 
-        // Unique product name within a category (for non-deleted products)
         builder.HasIndex(p => new { p.CategoryId, p.Name })
             .IsUnique()
             .HasFilter($"[{nameof(ISoftDelete.IsDeleted)}] = 0");

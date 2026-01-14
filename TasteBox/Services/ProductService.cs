@@ -73,19 +73,21 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         if (!unitExists)
             return Result.Failure<ProductResponse>(UnitErrors.UnitNotFound);
 
-        var product = new Product
+        var product = new Product()
         {
             CategoryId = categoryId,
             UnitId = request.UnitId,
             Name = request.Name,
             Description = request.Description,
             IsWeighedProduct = request.IsWeighedProduct,
-            DiscountedPrice = request.DiscountedPrice,
             UnitPrice = request.UnitPrice,
             CostPrice = request.CostPrice,
-            MinOrderQty = request.MinOrderQty,
+            DiscountedPrice = request.DiscountedPrice,
             MaxOrderQty = request.MaxOrderQty,
-            ImageUrl = await fileService.UploadAsync(request.ImageFile, nameof(UploadDirectory.Products),
+            MinOrderQty = request.MinOrderQty,
+            ImageUrl = await fileService.UploadAsync(
+                request.ImageFile,
+                nameof(UploadDirectory.Products),
                 cancellationToken)
         };
 

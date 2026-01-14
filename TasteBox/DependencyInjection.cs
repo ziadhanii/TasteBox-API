@@ -41,12 +41,8 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
-
-            options.EnableSensitiveDataLogging();
-            options.LogTo(Console.WriteLine);
             // options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
-
 
         return services;
     }

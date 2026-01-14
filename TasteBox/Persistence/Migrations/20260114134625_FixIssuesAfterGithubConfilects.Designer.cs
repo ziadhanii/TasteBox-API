@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TasteBox.Persistence;
 
@@ -11,9 +12,11 @@ using TasteBox.Persistence;
 namespace TasteBox.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260114134625_FixIssuesAfterGithubConfilects")]
+    partial class FixIssuesAfterGithubConfilects
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,6 +146,10 @@ namespace TasteBox.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal>("ReorderLevel")
                         .HasPrecision(18, 3)
                         .HasColumnType("decimal(18,3)");
 
