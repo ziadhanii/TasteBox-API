@@ -8,9 +8,9 @@ public class VerifyResetPasswordOtpRequestValidator : AbstractValidator<VerifyRe
             .NotEmpty()
             .EmailAddress();
 
-        RuleFor(x => x.Otp)
+        RuleFor(x => x.Code)
             .NotEmpty()
             .Length(6)
-            .Matches(@"^\d{6}$").WithMessage("OTP must be 6 digits");
+            .Matches(@"^\d{6}$").WithMessage("Code must be 6 digits");
     }
 }

@@ -31,6 +31,3 @@ global using TasteBox.Contracts.Product;
 global using TasteBox.Abstractions.Consts;
 global using TasteBox.Authentication.Filters;
 global using TasteBox.Contracts.Roles;
-global using TasteBox.Abstractions.Consts;
-global using TasteBox.Authentication.Filters;
-global using TasteBox.Contracts.Users;

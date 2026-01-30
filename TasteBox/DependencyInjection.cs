@@ -26,6 +26,9 @@ public static class DependencyInjection
         // Configure cache provider based on settings
         services.AddCacheServices(configuration);
 
+
+        services.AddScoped<EmailBodyBuilder>();
+
         services.AddScoped<IStockService, StockService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IProductService, ProductService>();
@@ -124,10 +127,12 @@ public static class DependencyInjection
             options.SwaggerDoc("dashboard",
                 new OpenApiInfo
                 {
-                    Title = "TasteBox-Dashboard-API", Version = "v1",
+                    Title = "TasteBox-Dashboard-API",
+                    Version = "v1",
                     Contact = new OpenApiContact
                     {
-                        Name = "TasteBox-Dashboard-API", Url = new Uri("https://github.com/ziadhanii/TasteBox"),
+                        Name = "TasteBox-Dashboard-API",
+                        Url = new Uri("https://github.com/ziadhanii/TasteBox"),
                         Email = "ziadhani64@gmail.com"
                     }
                 });
@@ -135,10 +140,12 @@ public static class DependencyInjection
             options.SwaggerDoc("mobile",
                 new OpenApiInfo
                 {
-                    Title = "TasteBox Mobile API", Version = "v1",
+                    Title = "TasteBox Mobile API",
+                    Version = "v1",
                     Contact = new OpenApiContact
                     {
-                        Name = "TasteBox-Mobile-API", Url = new Uri("https://github.com/ziadhanii/TasteBox"),
+                        Name = "TasteBox-Mobile-API",
+                        Url = new Uri("https://github.com/ziadhanii/TasteBox"),
                         Email = "ziadhani64@gmail.com"
                     }
                 });
@@ -146,7 +153,9 @@ public static class DependencyInjection
             options.AddSecurityDefinition("bearer",
                 new OpenApiSecurityScheme
                 {
-                    Type = SecuritySchemeType.Http, Scheme = "bearer", BearerFormat = "JWT",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
                     Description = "JWT Authorization header using the Bearer scheme."
                 });
 
@@ -188,7 +197,6 @@ public static class DependencyInjection
         services.AddDistributedMemoryCache();
 
         services.AddScoped<ICacheService, CacheService>();
-        services.AddScoped<IPasswordResetService, PasswordResetService>();
 
         return services;
     }

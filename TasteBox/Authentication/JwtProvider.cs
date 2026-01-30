@@ -35,7 +35,7 @@ public class JwtProvider(IOptions<JwtOptions> options) : IJwtProvider
             signingCredentials: singingCredentials
         );
 
-        return (token: new JwtSecurityTokenHandler().WriteToken(token), expiresIn: _options.ExpiryMinutes * 60);
+        return (token: new JwtSecurityTokenHandler().WriteToken(token), expiresIn: _options.ExpiryMinutes);
     }
 
     public string? ValidateToken(string token)

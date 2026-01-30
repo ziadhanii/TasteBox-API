@@ -6,7 +6,7 @@
 public class AccountController(IUserService userService) : ControllerBase
 {
     [HttpGet("")]
-    public async Task<IActionResult> Info()
+    public async Task<IActionResult> GetProfile()
     {
         var result = await userService.GetProfileAsync(User.GetUserId()!);
 
@@ -14,7 +14,7 @@ public class AccountController(IUserService userService) : ControllerBase
     }
 
     [HttpPut("info")]
-    public async Task<IActionResult> Info([FromBody] UpdateProfileRequest request)
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
     {
         await userService.UpdateProfileAsync(User.GetUserId()!, request);
 

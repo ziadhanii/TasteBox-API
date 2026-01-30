@@ -8,6 +8,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>3de41be9-01c5-4401-8149-860b46e30f3d</UserSecretsId>
     </PropertyGroup>
+    
+
 
     <ItemGroup>
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
@@ -23,6 +25,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
         <PackageReference Include="Scalar.AspNetCore" Version="2.12.6" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.7.1" />
@@ -30,6 +33,13 @@
 
     <ItemGroup>
         <Folder Include="Persistence\Migrations\" />
+        <Folder Include="wwwroot\uploads\Categories\" />
+        <Folder Include="wwwroot\uploads\Products\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\Templates\EmailConfirmation.html" />
+      <_ContentIncludedByDefault Remove="wwwroot\Templates\ForgetPassword.html" />
+    </ItemGroup>
+    
 </Project>

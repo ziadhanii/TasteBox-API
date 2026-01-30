@@ -118,7 +118,7 @@ public class UserService(
         return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
     }
 
-    public async Task<Result> ToggleStatus(string id)
+    public async Task<Result> ToggleStatusAsync(string id)
     {
         if (await userManager.FindByIdAsync(id) is not { } user)
             return Result.Failure(UserErrors.UserNotFound);
@@ -135,7 +135,7 @@ public class UserService(
         return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
     }
 
-    public async Task<Result> Unlock(string id)
+    public async Task<Result> UnlockAsync(string id)
     {
         if (await userManager.FindByIdAsync(id) is not { } user)
             return Result.Failure(UserErrors.UserNotFound);

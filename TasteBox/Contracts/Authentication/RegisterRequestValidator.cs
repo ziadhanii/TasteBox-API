@@ -23,5 +23,10 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         RuleFor(x => x.LastName)
             .NotEmpty()
             .Length(3, 100);
+
+        RuleFor(x => x.PhoneNumber)
+            .NotEmpty()
+            .Matches(RegexPatterns.EgyptianPhoneNumber)
+            .WithMessage("Phone number is not valid");
     }
 }

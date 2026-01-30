@@ -27,7 +27,7 @@ public class StockController(IStockService stockService) : ControllerBase
         RemoveQuantityRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await stockService.RemoveQuantityAsync(productId, request, cancellationToken);
+        var result = await stockService.DeductQuantityAsync(productId, request, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 }

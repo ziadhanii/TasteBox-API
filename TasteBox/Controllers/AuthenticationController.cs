@@ -1,8 +1,7 @@
 namespace TasteBox.Controllers;
 
 public class AuthenticationController(
-    IAuthService authService,
-    IPasswordResetService passwordResetService) : APIBaseController
+    IAuthService authService) : APIBaseController
 {
     [HttpPost("register")]
     public async Task<IActionResult> Register(
@@ -13,17 +12,23 @@ public class AuthenticationController(
         return result.IsSuccess ? Ok() : result.ToProblem();
     }
 
-    [HttpPost("verify-otp")]
-    public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
+    /// <summary>
+    /// Verify email address using OTP sent during registration
+    /// </summary>
+    [HttpPost("email/verify")]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyOtpRequest request)
     {
-        var result = await authService.VerifyOtpAsync(request.Email, request.Code);
+        var result = await authService.VerifyEmailAsync(request.Email, request.Code);
         return result.IsSuccess ? Ok() : result.ToProblem();
     }
 
-    [HttpPost("resend-otp")]
-    public async Task<IActionResult> ResendOtp([FromBody] ResendOtpRequest request)
+    /// <summary>
+    /// Resend email verification OTP
+    /// </summary>
+    [HttpPost("email/resend-otp")]
+    public async Task<IActionResult> ResendEmailVerificationOtp([FromBody] ResendOtpRequest request)
     {
-        var result = await authService.ResendOtpAsync(request.Email);
+        var result = await authService.ResendEmailVerificationOtpAsync(request.Email);
         return result.IsSuccess ? Ok() : result.ToProblem();
     }
 
@@ -32,7 +37,7 @@ public class AuthenticationController(
         [FromBody] LoginRequest request,
         CancellationToken cancellationToken)
     {
-        var authResult = await authService.GetTokenAsync(
+        var authResult = await authService.LoginAsync(
             request.Email,
             request.Password,
             cancellationToken);
@@ -40,12 +45,15 @@ public class AuthenticationController(
         return authResult.IsSuccess ? Ok(authResult.Value) : authResult.ToProblem();
     }
 
-    [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(
+    /// <summary>
+    /// Refresh access token using refresh token
+    /// </summary>
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshAccessToken(
         [FromBody] RefreshTokenRequest request,
         CancellationToken cancellationToken)
     {
-        var authResult = await authService.GetRefreshTokenAsync(
+        var authResult = await authService.RefreshAccessTokenAsync(
             request.Token,
             request.RefreshToken,
             cancellationToken);
@@ -74,7 +82,7 @@ public class AuthenticationController(
         [FromBody] SendResetPasswordOtpRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await passwordResetService.SendResetPasswordOtpAsync(request.Email, cancellationToken);
+        var result = await authService.SendResetPasswordOtpAsync(request.Email, cancellationToken);
         return result.IsSuccess ? Ok() : result.ToProblem();
     }
 
@@ -86,9 +94,9 @@ public class AuthenticationController(
         [FromBody] VerifyResetPasswordOtpRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await passwordResetService.VerifyResetPasswordOtpAsync(
+        var result = await authService.VerifyResetPasswordOtpAsync(
             request.Email,
-            request.Otp,
+            request.Code,
             cancellationToken);
 
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
@@ -102,7 +110,7 @@ public class AuthenticationController(
         [FromBody] ResetPasswordWithTokenRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await passwordResetService.ResetPasswordAsync(
+        var result = await authService.ResetPasswordAsync(
             request.Email,
             request.ResetToken,
             request.NewPassword,

@@ -26,7 +26,7 @@ public class UsersController(IUserService userService) : APIBaseController
         var result = await userService.AddAsync(request, cancellationToken);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(Get), new { result.Value.Id }, result.Value)
+            ? CreatedAtAction(nameof(Get), new { result.Value!.Id }, result.Value)
             : result.ToProblem();
     }
 
@@ -44,7 +44,7 @@ public class UsersController(IUserService userService) : APIBaseController
     [HasPermission(Permissions.UpdateUsers)]
     public async Task<IActionResult> ToggleStatus([FromRoute] string id)
     {
-        var result = await userService.ToggleStatus(id);
+        var result = await userService.ToggleStatusAsync(id);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
@@ -52,7 +52,7 @@ public class UsersController(IUserService userService) : APIBaseController
     [HasPermission(Permissions.UpdateUsers)]
     public async Task<IActionResult> Unlock([FromRoute] string id)
     {
-        var result = await userService.Unlock(id);
+        var result = await userService.UnlockAsync(id);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 }

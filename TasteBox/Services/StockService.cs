@@ -26,7 +26,7 @@ public class StockService(ApplicationDbContext context) : IStockService
         return Result.Success();
     }
 
-    public async Task<Result> RemoveQuantityAsync(int productId, RemoveQuantityRequest request,
+    public async Task<Result> DeductQuantityAsync(int productId, RemoveQuantityRequest request,
         CancellationToken cancellationToken = default)
     {
         var product =

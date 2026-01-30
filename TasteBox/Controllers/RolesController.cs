@@ -28,7 +28,7 @@ public class RolesController(IRoleService roleService) : APIBaseController
         var result = await roleService.AddAsync(request);
 
         return result.IsSuccess
-            ? CreatedAtAction(nameof(Get), new { result.Value.Id }, result.Value)
+            ? CreatedAtAction(nameof(Get), new { result.Value!.Id }, result.Value)
             : result.ToProblem();
     }
 
