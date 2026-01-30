@@ -1,7 +1,3 @@
-using TasteBox.Contracts.Stock;
-using TasteBox.Extensions;
-using TasteBox.Utilities;
-
 namespace TasteBox.Controllers;
 
 [Route("api/v1/products/{productId}/stock")]

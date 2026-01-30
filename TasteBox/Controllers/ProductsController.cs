@@ -1,7 +1,3 @@
-using TasteBox.Contracts.Product;
-using TasteBox.Extensions;
-using TasteBox.Utilities;
-
 namespace TasteBox.Controllers;
 
 [ApiController]
