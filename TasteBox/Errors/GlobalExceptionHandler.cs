@@ -16,6 +16,9 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             Type = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1"
         };
 
+        problemDetails.Detail = exception.Message;
+        problemDetails.Extensions["stackTrace"] = exception.StackTrace;
+
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken: cancellationToken);

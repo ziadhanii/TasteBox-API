@@ -1,7 +1,3 @@
-using TasteBox.Contracts.Stock;
-using TasteBox.Extensions;
-using TasteBox.Utilities;
-
 namespace TasteBox.Controllers;
 
 [Route("api/v1/products/{productId}/stock")]
@@ -31,7 +27,7 @@ public class StockController(IStockService stockService) : ControllerBase
         RemoveQuantityRequest request,
         CancellationToken cancellationToken)
     {
-        var result = await stockService.RemoveQuantityAsync(productId, request, cancellationToken);
+        var result = await stockService.DeductQuantityAsync(productId, request, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 }

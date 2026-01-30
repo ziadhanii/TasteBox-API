@@ -1,6 +1,3 @@
-using TasteBox.Extensions;
-using TasteBox.Utilities;
-
 namespace TasteBox.Controllers;
 
 public class CategoriesController(ICategoryService categoryService) : APIBaseController

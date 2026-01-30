@@ -11,7 +11,7 @@ public interface IStockService
         CancellationToken cancellationToken = default);
 
 
-    Task<Result> RemoveQuantityAsync(
+    Task<Result> DeductQuantityAsync(
         int productId,
         RemoveQuantityRequest request,
         CancellationToken cancellationToken = default);
