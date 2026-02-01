@@ -116,7 +116,7 @@ public class UnitService(ApplicationDbContext context) : IUnitService
             .AnyAsync(p => p.UnitId == id, cancellationToken);
 
         if (isInUse)
-            return Result.Failure(UnitErrors.CannotDeleteUnitInUse);
+            return Result.Failure(UnitErrors.CannotDeactivateUnitInUse);
 
         unit.IsDeleted = !unit.IsDeleted;
 
