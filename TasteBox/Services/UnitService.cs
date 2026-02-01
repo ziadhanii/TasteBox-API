@@ -97,7 +97,10 @@ public class UnitService(ApplicationDbContext context) : IUnitService
         if (request.ConversionFactorToBaseUnit <= 0)
             return Result.Failure(UnitErrors.InvalidConversionFactor);
 
-        request.Adapt(unit);
+        unit.Name = request.Name;
+        unit.Symbol = request.Symbol;
+        unit.IsBaseUnit = request.IsBaseUnit;
+        unit.ConversionFactorToBaseUnit = request.ConversionFactorToBaseUnit;
 
         await context.SaveChangesAsync(cancellationToken);
 
@@ -115,19 +118,11 @@ public class UnitService(ApplicationDbContext context) : IUnitService
         var isInUse = await context.Products
             .AnyAsync(p => p.UnitId == id, cancellationToken);
 
-        if (!unit.IsDeleted && isInUse)
+        if (isInUse && !unit.IsDeleted)
             return Result.Failure(UnitErrors.CannotDeactivateUnitInUse);
 
-        if (!unit.IsDeleted)
-        {
-            unit.IsDeleted = true;
-            unit.DeletedAt = DateTime.UtcNow;
-        }
-        else
-        {
-            unit.IsDeleted = false;
-            unit.DeletedAt = null;
-        }
+        unit.IsDeleted = !unit.IsDeleted;
+        unit.DeletedAt = DateTime.UtcNow;
 
         await context.SaveChangesAsync(cancellationToken);
 
