@@ -115,10 +115,19 @@ public class UnitService(ApplicationDbContext context) : IUnitService
         var isInUse = await context.Products
             .AnyAsync(p => p.UnitId == id, cancellationToken);
 
-        if (isInUse)
+        if (!unit.IsDeleted && isInUse)
             return Result.Failure(UnitErrors.CannotDeactivateUnitInUse);
 
-        unit.IsDeleted = !unit.IsDeleted;
+        if (!unit.IsDeleted)
+        {
+            unit.IsDeleted = true;
+            unit.DeletedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            unit.IsDeleted = false;
+            unit.DeletedAt = null;
+        }
 
         await context.SaveChangesAsync(cancellationToken);
 

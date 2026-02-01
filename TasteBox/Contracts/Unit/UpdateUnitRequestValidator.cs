@@ -6,7 +6,7 @@ public class UpdateUnitRequestValidator : AbstractValidator<UpdateUnitRequest>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .MaximumLength(50);
+            .MaximumLength(20);
 
         RuleFor(x => x.Symbol)
             .NotEmpty()
