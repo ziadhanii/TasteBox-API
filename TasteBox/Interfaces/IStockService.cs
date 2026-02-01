@@ -20,4 +20,7 @@ public interface IStockService
     Task<Result<StockResponse>> GetStockByProductIdAsync(
         int productId,
         CancellationToken cancellationToken = default);
+
+    Task<Result<List<StockResponse>>> GetLowStockProductsAsync(
+        CancellationToken cancellationToken = default);
 }

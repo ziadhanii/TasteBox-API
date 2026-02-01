@@ -63,4 +63,17 @@ public class StockService(ApplicationDbContext context) : IStockService
             ? Result.Failure<StockResponse>(ProductErrors.ProductNotFound)
             : Result.Success(stock);
     }
+
+    public async Task<Result<List<StockResponse>>> GetLowStockProductsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var lowStockProducts = await context
+            .Stock
+            .AsNoTracking()
+            .Where(s => s.Quantity <= s.MinQuantity)
+            .ProjectToType<StockResponse>()
+            .ToListAsync(cancellationToken);
+
+        return Result.Success(lowStockProducts);
+    }
 }

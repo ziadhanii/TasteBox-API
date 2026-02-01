@@ -1,3 +1,5 @@
+namespace TasteBox.Helpers;
+
 public class EmailBodyBuilder(IWebHostEnvironment env)
 {
     public string GenerateEmailBody(string template, Dictionary<string, string> templateModel)
