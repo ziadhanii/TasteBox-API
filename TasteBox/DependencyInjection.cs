@@ -1,7 +1,9 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using TasteBox.Helpers;
 using TasteBox.Settings;
+using System.Text.Json.Serialization;
 
 namespace TasteBox;
 
@@ -11,7 +13,14 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddRouting(options => { options.LowercaseUrls = true; });
-        services.AddControllers();
+        services
+            .AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters
+                    .Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
 
         services
             .AddInfrastructureServices(configuration)
@@ -39,6 +48,8 @@ public static class DependencyInjection
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IOtpService, OtpService>();
         services.AddScoped<IEmailSender, EmailService>();
+        services.AddScoped<IUnitService, UnitService>();
+        services.AddScoped<IUnitConverter, UnitConverter>();
 
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -161,7 +172,7 @@ public static class DependencyInjection
                 });
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-                { [new OpenApiSecuritySchemeReference("bearer", document)] = [] });
+            { [new OpenApiSecuritySchemeReference("bearer", document)] = [] });
         });
         return services;
     }
