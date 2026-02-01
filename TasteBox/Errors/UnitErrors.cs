@@ -23,5 +23,5 @@ public class UnitErrors
         new("Unit.BaseUnitFactor", "Base unit must have conversion factor of 1", StatusCodes.Status400BadRequest);
 
     public static readonly Error IncompatibleUnits =
-        new("Unit.Incompatible", "Cannot convert between different unit types", 400);
+        new("Unit.Incompatible", "Cannot convert between different unit types", StatusCodes.Status400BadRequest);
 }

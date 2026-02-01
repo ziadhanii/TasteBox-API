@@ -19,13 +19,9 @@ public class UnitConverter : IUnitConverter
         if (!CanConvert(from, to))
             return Result.Failure<decimal>(UnitErrors.IncompatibleUnits);
 
-        decimal baseQuantity = from.ConversionFactorToBaseUnit == 1m
-            ? quantity
-            : quantity * from.ConversionFactorToBaseUnit;
+        decimal baseQuantity = quantity * from.ConversionFactorToBaseUnit;
 
-        decimal converted = to.ConversionFactorToBaseUnit == 1m
-            ? baseQuantity
-            : baseQuantity / to.ConversionFactorToBaseUnit;
+        decimal converted = baseQuantity / to.ConversionFactorToBaseUnit;
 
         return Result.Success(converted);
     }

@@ -30,7 +30,7 @@ public class UnitsController(IUnitService unitService) : APIBaseController
 
     [HttpGet]
     [Route("types")]
-    public IActionResult GetAll()
+    public IActionResult GetAllTypes()
     {
         return Ok(Enum
             .GetValues<UnitType>()
