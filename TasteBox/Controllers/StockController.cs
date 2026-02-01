@@ -4,15 +4,15 @@ namespace TasteBox.Controllers;
 [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
 public class StockController(IStockService stockService) : ControllerBase
 {
-    [HttpGet("")]
+    [HttpGet]
     public async Task<IActionResult> GetStock([FromRoute] int productId)
     {
         var result = await stockService.GetStockByProductIdAsync(productId);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 
-    [HttpPut("add")]
-    public async Task<IActionResult> AddQuantity(
+    [HttpPost("increase")]
+    public async Task<IActionResult> IncreaseQuantity(
         [FromRoute] int productId,
         AddQuantityRequest request,
         CancellationToken cancellationToken)
@@ -21,13 +21,20 @@ public class StockController(IStockService stockService) : ControllerBase
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
-    [HttpPut("deduct")]
-    public async Task<IActionResult> DeductQuantity(
+    [HttpPost("decrease")]
+    public async Task<IActionResult> DecreaseQuantity(
         [FromRoute] int productId,
         RemoveQuantityRequest request,
         CancellationToken cancellationToken)
     {
         var result = await stockService.DeductQuantityAsync(productId, request, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+
+    [HttpGet("/api/v1/stock/low-stock")]
+    public async Task<IActionResult> GetLowStockProducts(CancellationToken cancellationToken)
+    {
+        var result = await stockService.GetLowStockProductsAsync(cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
 }

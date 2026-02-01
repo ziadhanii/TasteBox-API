@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using TasteBox.Helpers;
 using TasteBox.Settings;
 
 namespace TasteBox;
