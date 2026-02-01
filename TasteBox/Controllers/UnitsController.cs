@@ -64,7 +64,7 @@ public class UnitsController(IUnitService unitService) : APIBaseController
     }
 
 
-    [HttpPut("{id}")]
+    [HttpPut("{id}/toggle-status")]
     public async Task<IActionResult> ToggleStatusAsync([FromRoute] int id, CancellationToken cancellationToken)
     {
         var result = await unitService.ToggleStatusAsync(id, cancellationToken);
