@@ -7,4 +7,5 @@ public class ApplicationUser : IdentityUser
 
     public bool IsDisabled { get; set; }
     public List<RefreshToken> RefreshTokens { get; set; } = [];
+    public ICollection<UserFavorite> Favorites { get; set; } = [];
 }

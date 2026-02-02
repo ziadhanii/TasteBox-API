@@ -10,6 +10,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Product> Products { get; set; }
     public DbSet<Unit> Units { get; set; }
 
+    public DbSet<UserFavorite> UserFavorites { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(
@@ -20,6 +22,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .GetEntityTypes()
             .SelectMany(t => t.GetForeignKeys())
             .Where(fk => !fk.IsOwnership &&
+                         fk.DeclaringEntityType.ClrType != typeof(UserFavorite) &&
                          fk.DeleteBehavior == DeleteBehavior.Cascade);
 
         foreach (var fk in cascadeFKs)
