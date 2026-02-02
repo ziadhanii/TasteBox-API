@@ -1,8 +1,10 @@
 namespace TasteBox.Contracts.Users;
 
 public record UserProfileResponse(
-    string Email,
     string UserName,
+    string Email,
     string FirstName,
-    string LastName
+    string LastName,
+    string FullName,
+    string PhoneNumber
 );

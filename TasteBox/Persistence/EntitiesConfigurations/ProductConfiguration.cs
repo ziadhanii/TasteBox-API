@@ -15,13 +15,14 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.HasOne<Category>()
+        builder.HasOne(p => p.Category)
             .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId);
 
         builder.HasOne(p => p.Unit)
             .WithMany()
-            .HasForeignKey(p => p.UnitId);
+            .HasForeignKey(p => p.UnitId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(p => new { p.CategoryId, p.Name })
             .IsUnique()

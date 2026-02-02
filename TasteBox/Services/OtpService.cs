@@ -22,8 +22,12 @@ public sealed class OtpService(
     public async Task<Result> SendOtpAsync(string email)
     {
         var user = await userManager.FindByEmailAsync(email);
+
         if (user is null)
             return Result.Failure(UserErrors.InvalidCredentials);
+
+        if (user.EmailConfirmed)
+            return Result.Failure(UserErrors.EmailAlreadyConfirmed);
 
         var rateLimitResult = await EnforceRateLimitAsync(email);
         if (!rateLimitResult.IsSuccess)
@@ -44,11 +48,26 @@ public sealed class OtpService(
         if (user is null)
             return Result.Failure<ApplicationUser>(UserErrors.InvalidCredentials);
 
+        if (user.EmailConfirmed)
+            return Result.Failure<ApplicationUser>(UserErrors.EmailAlreadyConfirmed);
+
         var cacheKey = CacheKeys.EmailVerificationOtp(email);
         var otpData = await cacheService.GetAsync<EmailVerificationOtpData>(cacheKey);
 
-        if (otpData is null || otpData.IsUsed)
+        if (otpData is null)
             return Result.Failure<ApplicationUser>(UserErrors.InvalidOtp);
+
+        if (otpData.IsUsed)
+        {
+            await cacheService.RemoveAsync(cacheKey);
+            return Result.Failure<ApplicationUser>(UserErrors.InvalidOtp);
+        }
+
+        if (DateTime.UtcNow > otpData.ExpiresAt)
+        {
+            await cacheService.RemoveAsync(cacheKey);
+            return Result.Failure<ApplicationUser>(UserErrors.OtpExpired);
+        }
 
         if (!CryptoHelper.VerifyHash(code, otpData.HashedOtp))
             return Result.Failure<ApplicationUser>(UserErrors.InvalidCode);
@@ -84,7 +103,8 @@ public sealed class OtpService(
         {
             HashedOtp = CryptoHelper.ComputeHash(otp),
             UserId = userId,
-            Email = email
+            Email = email,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(OtpExpirationMinutes)
         };
 
         await cacheService.SetAsync(

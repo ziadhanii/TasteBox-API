@@ -1,3 +1,4 @@
+using System.Collections;
 using TasteBox.Abstractions;
 using TasteBox.Contracts.Product;
 using TasteBox.Utilities;
@@ -25,9 +26,13 @@ public interface IProductService
         UpdateProductRequest request,
         CancellationToken cancellationToken = default);
 
-    // TOGGLE STATUS SOFT DELETE
     Task<Result> ToggleProductStatusAsync(
         int categoryId,
         int id,
         CancellationToken cancellationToken = default);
+
+    Task<Result<List<ProductResponse>>> GetBestSellingProductsAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<ProductResponse>> SearchProductsAsync(string query, CancellationToken cancellationToken = default);
 }

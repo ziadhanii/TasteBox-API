@@ -19,6 +19,7 @@ public class Product : ISoftDelete
     public int UnitId { get; set; }
     public Stock Stock { get; set; } = default!;
     public Unit Unit { get; set; } = default!;
+    public Category Category { get; set; } = default!;
 
     public bool IsDeleted { get; set; }
     public DateTime? DeletedAt { get; set; }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using TasteBox.Helpers;
 using TasteBox.Settings;
 using System.Text.Json.Serialization;
+using StackExchange.Redis;
 
 namespace TasteBox;
 
@@ -33,9 +34,7 @@ public static class DependencyInjection
 
         services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
 
-        // Configure cache provider based on settings
         services.AddCacheServices(configuration);
-
 
         services.AddScoped<EmailBodyBuilder>();
 
@@ -172,7 +171,7 @@ public static class DependencyInjection
                 });
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-            { [new OpenApiSecuritySchemeReference("bearer", document)] = [] });
+                { [new OpenApiSecuritySchemeReference("bearer", document)] = [] });
         });
         return services;
     }
@@ -196,19 +195,30 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddCacheServices(this IServiceCollection services,
+    private static IServiceCollection AddCacheServices(
+        this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Using in-memory cache by default
-        // To use Redis, install Microsoft.Extensions.Caching.StackExchangeRedis package and configure:
-        // services.AddStackExchangeRedisCache(options =>
-        // {
-        //     options.Configuration = "your-redis-connection-string";
-        //     options.InstanceName = "TasteBox:";
-        // });
-        services.AddDistributedMemoryCache();
-
         services.AddScoped<ICacheService, CacheService>();
+
+        services.AddOptions<CacheSettings>()
+            .BindConfiguration(CacheSettings.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        var settings = configuration
+            .GetSection(CacheSettings.SectionName)
+            .Get<CacheSettings>();
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.ConfigurationOptions = new ConfigurationOptions
+            {
+                EndPoints = { { settings.Host, settings.Port } },
+                User = settings.User,
+                Password = settings.Password
+            };
+        });
 
         return services;
     }
