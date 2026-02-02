@@ -49,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IEmailSender, EmailService>();
         services.AddScoped<IUnitService, UnitService>();
         services.AddScoped<IUnitConverter, UnitConverter>();
+        services.AddScoped<IUserFavoritesService, UserFavoritesService>();
 
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
