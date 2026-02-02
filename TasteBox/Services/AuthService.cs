@@ -118,7 +118,6 @@ public sealed class AuthService(
     {
         var user = await userManager.FindByEmailAsync(email);
 
-        // Return success even for non-existent emails (security best practice)
         if (user is null)
         {
             logger.LogWarning("Password reset requested for non-existent email: {Email}", email);
@@ -129,11 +128,14 @@ public sealed class AuthService(
             return Result.Failure(UserErrors.EmailNotConfirmed);
 
         var rateLimitResult = await EnforceRateLimitAsync(email, cancellationToken);
+
         if (!rateLimitResult.IsSuccess)
             return rateLimitResult;
 
         var otp = CryptoHelper.GenerateOtp();
+
         await StorePasswordResetOtpAsync(email, otp, cancellationToken);
+
         await SendPasswordResetEmailAsync(user.Email!, otp);
 
         logger.LogInformation("Password reset OTP sent to: {Email}", email);
@@ -149,8 +151,20 @@ public sealed class AuthService(
         var cacheKey = CacheKeys.PasswordResetOtp(email);
         var otpData = await cacheService.GetAsync<PasswordResetOtpData>(cacheKey, cancellationToken);
 
-        if (otpData is null || otpData.IsUsed)
+        if (otpData is null)
             return Result.Failure<VerifyResetPasswordOtpResponse>(UserErrors.InvalidOtp);
+
+        if (otpData.IsUsed)
+        {
+            await cacheService.RemoveAsync(cacheKey, cancellationToken);
+            return Result.Failure<VerifyResetPasswordOtpResponse>(UserErrors.InvalidOtp);
+        }
+
+        if (DateTime.UtcNow > otpData.ExpiresAt)
+        {
+            await cacheService.RemoveAsync(cacheKey, cancellationToken);
+            return Result.Failure<VerifyResetPasswordOtpResponse>(UserErrors.OtpExpired);
+        }
 
         if (!CryptoHelper.VerifyHash(otp, otpData.HashedOtp))
             return Result.Failure<VerifyResetPasswordOtpResponse>(UserErrors.InvalidOtp);
@@ -174,8 +188,20 @@ public sealed class AuthService(
         var cacheKey = CacheKeys.PasswordResetToken(email);
         var tokenData = await cacheService.GetAsync<PasswordResetTokenData>(cacheKey, cancellationToken);
 
-        if (tokenData is null || tokenData.IsUsed)
+        if (tokenData is null)
             return Result.Failure(UserErrors.InvalidResetToken);
+
+        if (tokenData.IsUsed)
+        {
+            await cacheService.RemoveAsync(cacheKey, cancellationToken);
+            return Result.Failure(UserErrors.InvalidResetToken);
+        }
+
+        if (DateTime.UtcNow > tokenData.ExpiresAt)
+        {
+            await cacheService.RemoveAsync(cacheKey, cancellationToken);
+            return Result.Failure(UserErrors.InvalidResetToken);
+        }
 
         if (!CryptoHelper.VerifyHash(resetToken, tokenData.HashedToken))
             return Result.Failure(UserErrors.InvalidResetToken);
@@ -305,7 +331,8 @@ public sealed class AuthService(
         var otpData = new PasswordResetOtpData
         {
             HashedOtp = CryptoHelper.ComputeHash(otp),
-            Email = email
+            Email = email,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(OtpExpirationMinutes)
         };
 
         await cacheService.SetAsync(
@@ -333,7 +360,8 @@ public sealed class AuthService(
         var resetTokenData = new PasswordResetTokenData
         {
             HashedToken = CryptoHelper.ComputeHash(resetToken),
-            Email = email
+            Email = email,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(ResetTokenExpirationMinutes)
         };
 
         await cacheService.SetAsync(

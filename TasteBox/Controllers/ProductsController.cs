@@ -57,4 +57,25 @@ public class ProductsController(IProductService productService) : ControllerBase
         var result = await productService.ToggleProductStatusAsync(categoryId, id, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
+
+
+    [HttpGet]
+    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [Route("/api/v1/products/search")]
+    public async Task<IActionResult> SearchProducts(
+        [FromQuery] string query,
+        CancellationToken cancellationToken)
+    {
+        var result = await productService.SearchProductsAsync(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [Route("/api/v1/products/best-selling")]
+    public async Task<IActionResult> GetBestSellingProducts(CancellationToken cancellationToken)
+    {
+        var result = await productService.GetBestSellingProductsAsync(cancellationToken);
+        return Ok(result);
+    }
 }

@@ -5,5 +5,6 @@ public sealed class PasswordResetOtpData
     public required string HashedOtp { get; init; }
     public required string Email { get; init; }
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    public required DateTime ExpiresAt { get; init; }
     public bool IsUsed { get; set; }
 }

@@ -163,21 +163,29 @@ public class UserService(
 
     public async Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request)
     {
-        //var user = await _userManager.FindByIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
 
-        //user = request.Adapt(user);
+        if (user is null)
+            return Result.Failure(UserErrors.UserNotFound);
 
-        //await _userManager.UpdateAsync(user!);
+        if (!string.IsNullOrWhiteSpace(request.UserName))
+        {
+            var userNameExists = await userManager.Users
+                .AnyAsync(u => u.UserName == request.UserName && u.Id != userId);
 
-        await userManager.Users
-            .Where(x => x.Id == userId)
-            .ExecuteUpdateAsync(setters =>
-                setters
-                    .SetProperty(x => x.FirstName, request.FirstName)
-                    .SetProperty(x => x.LastName, request.LastName)
-            );
+            if (userNameExists)
+                return Result.Failure(UserErrors.DuplicatedUserName);
+        }
 
-        return Result.Success();
+        request.Adapt(user);
+
+        var result = await userManager.UpdateAsync(user);
+
+        if (result.Succeeded)
+            return Result.Success();
+
+        var error = result.Errors.First();
+        return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
     }
 
     public async Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request)

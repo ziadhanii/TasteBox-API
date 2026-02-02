@@ -31,7 +31,7 @@ public class StockController(IStockService stockService) : ControllerBase
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
-    [HttpGet("/api/v1/stock/low-stock")]
+    [HttpGet("/api/v1/stock/low")]
     public async Task<IActionResult> GetLowStockProducts(CancellationToken cancellationToken)
     {
         var result = await stockService.GetLowStockProductsAsync(cancellationToken);

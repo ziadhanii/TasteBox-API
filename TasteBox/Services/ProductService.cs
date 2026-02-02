@@ -1,9 +1,6 @@
 using TasteBox.Abstractions;
-using TasteBox.Contracts.Product;
-using TasteBox.Errors;
-using TasteBox.Utilities;
 using System.Linq.Dynamic.Core;
-using TasteBox.Utilities.File;
+
 
 namespace TasteBox.Services;
 
@@ -159,5 +156,37 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         product.IsDeleted = !product.IsDeleted;
         await context.SaveChangesAsync(cancellationToken);
         return Result.Success();
+    }
+
+    public async Task<Result<List<ProductResponse>>> GetBestSellingProductsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        // TO DO to implement best-selling logic
+        var products = await context.Products
+            .AsNoTracking()
+            .ProjectToType<ProductResponse>()
+            .ToListAsync(cancellationToken);
+        return Result.Success(products);
+    }
+
+    public async Task<IEnumerable<ProductResponse>> SearchProductsAsync(
+        string query,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return [];
+
+        query = query.Trim().ToLower();
+
+        return await context.Products
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Where(p =>
+                p.Name.ToLower().Contains(query) ||
+                p.Description.ToLower().Contains(query) ||
+                p.Category.Name.ToLower().Contains(query)
+            )
+            .ProjectToType<ProductResponse>()
+            .ToListAsync(cancellationToken);
     }
 }

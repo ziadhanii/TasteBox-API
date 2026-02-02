@@ -5,12 +5,14 @@ public record ProductResponse(
     string Name,
     string Description,
     string ImageUrl,
-    bool IsWeighedProduct,
     decimal UnitPrice,
     decimal? DiscountedPrice,
-    decimal MinOrderQty,
-    decimal MaxOrderQty,
+    bool HasDiscount,
+    bool IsWeighedProduct,
     string UnitName,
     string UnitSymbol,
-    decimal QuantityInStock
+    decimal MinOrderQty,
+    decimal MaxOrderQty,
+    decimal QuantityInStock,
+    bool IsAvailable
 );

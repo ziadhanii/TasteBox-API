@@ -7,5 +7,6 @@ public sealed class EmailVerificationOtpData
     public required string UserId { get; init; }
     public required string Email { get; init; }
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    public required DateTime ExpiresAt { get; init; }
     public bool IsUsed { get; set; }
 }

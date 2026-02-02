@@ -41,5 +41,10 @@
       <_ContentIncludedByDefault Remove="wwwroot\Templates\EmailConfirmation.html" />
       <_ContentIncludedByDefault Remove="wwwroot\Templates\ForgetPassword.html" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Include="wwwroot\Templates\EmailConfirmation.html" />
+      <None Include="wwwroot\Templates\ForgetPassword.html" />
+    </ItemGroup>
     
 </Project>
