@@ -26,7 +26,7 @@ public class UserMappingConfig : IRegister
         // UpdateProfileRequest -> ApplicationUser (ignore null values)
         config.NewConfig<UpdateProfileRequest, ApplicationUser>()
             .IgnoreNullValues(true)
-            .Map(dest => dest.NormalizedUserName, 
+            .Map(dest => dest.NormalizedUserName,
                 src => !string.IsNullOrWhiteSpace(src.UserName) ? src.UserName.ToUpper() : null);
 
         // ApplicationUser -> UserProfileResponse

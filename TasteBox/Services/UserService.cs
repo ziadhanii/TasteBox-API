@@ -11,20 +11,20 @@ public class UserService(
 {
     public async Task<IEnumerable<UserResponse>> GetAllAsync(CancellationToken cancellationToken = default) =>
         await (from u in context.Users
-                join ur in context.UserRoles
-                    on u.Id equals ur.UserId
-                join r in context.Roles
-                    on ur.RoleId equals r.Id into roles
-                where !roles.Any(x => x.Name == DefaultRoles.Customer)
-                select new
-                {
-                    u.Id,
-                    u.FirstName,
-                    u.LastName,
-                    u.Email,
-                    u.IsDisabled,
-                    Roles = roles.Select(x => x.Name!).ToList()
-                }
+               join ur in context.UserRoles
+                   on u.Id equals ur.UserId
+               join r in context.Roles
+                   on ur.RoleId equals r.Id into roles
+               where !roles.Any(x => x.Name == DefaultRoles.Customer)
+               select new
+               {
+                   u.Id,
+                   u.FirstName,
+                   u.LastName,
+                   u.Email,
+                   u.IsDisabled,
+                   Roles = roles.Select(x => x.Name!).ToList()
+               }
             )
             .GroupBy(u => new { u.Id, u.FirstName, u.LastName, u.Email, u.IsDisabled })
             .Select(u => new UserResponse
