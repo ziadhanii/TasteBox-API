@@ -18,23 +18,23 @@ public class FavoritesController(IUserFavoritesService favoritesService) : APIBa
     }
 
     [HttpDelete("{productId}")]
-    public async Task<IActionResult> Remove([FromRoute] int productId, CancellationToken cancellation)
+    public async Task<IActionResult> Remove([FromRoute] int productId, CancellationToken cancellationToken)
     {
-        var result = await favoritesService.RemoveFromFavoritesAsync(User.GetUserId()!, productId, cancellation);
+        var result = await favoritesService.RemoveFromFavoritesAsync(User.GetUserId()!, productId, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
     [HttpDelete("clear")]
-    public async Task<IActionResult> Clear(CancellationToken cancellation)
+    public async Task<IActionResult> Clear(CancellationToken cancellationToken)
     {
-        var result = await favoritesService.RemoveAllFavoritesAsync(User.GetUserId()!, cancellation);
+        var result = await favoritesService.RemoveAllFavoritesAsync(User.GetUserId()!, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
     }
 
     [HttpGet("count")]
-    public async Task<IActionResult> Count(CancellationToken cancellation)
+    public async Task<IActionResult> Count(CancellationToken cancellationToken)
     {
-        var count = await favoritesService.GetFavoritesCountAsync(User.GetUserId()!, cancellation);
+        var count = await favoritesService.GetFavoritesCountAsync(User.GetUserId()!, cancellationToken);
         return Ok(new { Count = count });
     }
 }

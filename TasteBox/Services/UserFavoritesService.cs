@@ -21,6 +21,14 @@ public class UserFavoritesService(ApplicationDbContext context) : IUserFavorites
         int productId,
         CancellationToken cancellationToken)
     {
+        var productExists = await context.Products
+            .AsNoTracking()
+            .AnyAsync(p => p.Id == productId, cancellationToken);
+
+        if (!productExists)
+        {
+            return Result.Failure(UserFavoritesErrors.UserFavoriteNotFound);
+        }
         context.UserFavorites.Add(new UserFavorite
         {
             UserId = userId,
