@@ -26,8 +26,7 @@ public class UserFavoritesService(ApplicationDbContext context) : IUserFavorites
             .AnyAsync(p => p.Id == productId, cancellationToken);
 
         if (!productExists)
-            return Result.Failure(UserFavoritesErrors.UserFavoriteNotFound);
-
+            return Result.Failure(ProductErrors.ProductNotFound);
 
         var alreadyFavorited = await context
             .UserFavorites
@@ -77,9 +76,10 @@ public class UserFavoritesService(ApplicationDbContext context) : IUserFavorites
             .AsNoTracking()
             .AnyAsync(x => x.UserId == userId && x.ProductId == productId, cancellationToken);
 
-
-    public Task<int> GetFavoritesCountAsync(string userId, CancellationToken cancellationToken)
-        => context.UserFavorites
+    public async Task<int> GetFavoritesCountAsync(string userId, CancellationToken cancellationToken)
+    {
+        return await context.UserFavorites
             .AsNoTracking()
-            .CountAsync(x => x.UserId == userId, cancellationToken);
+            .CountAsync(uf => uf.UserId == userId, cancellationToken);
+    }
 }
