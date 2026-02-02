@@ -26,24 +26,27 @@ public class UserFavoritesService(ApplicationDbContext context) : IUserFavorites
             .AnyAsync(p => p.Id == productId, cancellationToken);
 
         if (!productExists)
-        {
             return Result.Failure(UserFavoritesErrors.UserFavoriteNotFound);
-        }
-        context.UserFavorites.Add(new UserFavorite
+
+
+        var alreadyFavorited = await context
+            .UserFavorites
+            .AsNoTracking()
+            .AnyAsync(uf => uf.UserId == userId && uf.ProductId == productId, cancellationToken);
+
+        if (alreadyFavorited)
+            return Result.Failure(UserFavoritesErrors.UserFavoriteAlreadyExists);
+
+        var userFavorite = new UserFavorite
         {
             UserId = userId,
             ProductId = productId
-        });
+        };
 
-        try
-        {
-            await context.SaveChangesAsync(cancellationToken);
-            return Result.Success();
-        }
-        catch
-        {
-            return Result.Failure(UserFavoritesErrors.UserFavoriteAlreadyExists);
-        }
+        context.UserFavorites.Add(userFavorite);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
     }
 
     public async Task<Result> RemoveFromFavoritesAsync(
