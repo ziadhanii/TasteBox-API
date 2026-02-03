@@ -1,12 +1,11 @@
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 
 namespace TasteBox.Services;
 
-/// <summary>
-/// Provides distributed cache operations with JSON serialization
-/// </summary>
-public sealed class CacheService(IDistributedCache cache) : ICacheService
+public sealed class CacheService(IDistributedCache cache, IConnectionMultiplexer? connectionMultiplexer = null)
+    : ICacheService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -55,5 +54,42 @@ public sealed class CacheService(IDistributedCache cache) : ICacheService
 
         var value = await cache.GetStringAsync(key, cancellationToken);
         return !string.IsNullOrEmpty(value);
+    }
+
+    public Task CacheResponseAsync(string cacheKey, object response, TimeSpan timeToLive)
+        => SetAsync(cacheKey, response, timeToLive);
+
+    public async Task<string?> GetCachedResponseAsync(string cacheKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(cacheKey);
+
+        var cachedData = await GetAsync<object>(cacheKey);
+        return cachedData != null ? JsonSerializer.Serialize(cachedData, JsonOptions) : null;
+    }
+
+    public async Task RemoveCacheByPatternAsync(string pattern)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(pattern);
+
+        if (connectionMultiplexer == null)
+        {
+            await RemoveAsync(pattern);
+            return;
+        }
+
+        var database = connectionMultiplexer.GetDatabase();
+        var endpoints = connectionMultiplexer.GetEndPoints();
+
+        foreach (var endpoint in endpoints)
+        {
+            var server = connectionMultiplexer.GetServer(endpoint);
+
+            var keys = server.Keys(pattern: $"*{pattern}*").ToArray();
+
+            if (keys.Length > 0)
+            {
+                await database.KeyDeleteAsync(keys);
+            }
+        }
     }
 }
