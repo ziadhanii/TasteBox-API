@@ -51,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitService, UnitService>();
         services.AddScoped<IUnitConverter, UnitConverter>();
         services.AddScoped<IUserFavoritesService, UserFavoritesService>();
+        services.AddScoped<ICartService, CartService>();
 
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -209,8 +210,23 @@ public static class DependencyInjection
             .ValidateOnStart();
 
         var settings = configuration
-            .GetSection(CacheSettings.SectionName)
-            .Get<CacheSettings>();
+                           .GetSection(CacheSettings.SectionName)
+                           .Get<CacheSettings>()
+                       ?? throw new InvalidOperationException("Cache settings not configured");
+
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var configurationOptions = new ConfigurationOptions
+            {
+                EndPoints = { { settings.Host, settings.Port } },
+                User = settings.User,
+                Password = settings.Password,
+                AbortOnConnectFail = false,
+                ConnectTimeout = 5000,
+                SyncTimeout = 5000
+            };
+            return ConnectionMultiplexer.Connect(configurationOptions);
+        });
 
         services.AddStackExchangeRedisCache(options =>
         {

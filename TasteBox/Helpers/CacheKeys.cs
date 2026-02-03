@@ -9,6 +9,9 @@ public static class CacheKeys
     private const string PasswordResetTokenPrefix = "password_reset:token";
     private const string PasswordResetRateLimitPrefix = "password_reset:rate_limit";
 
+    // Cart cache patterns
+    public const string CartPattern = "/api/v1/cart";
+
     public static string EmailVerificationOtp(string email)
         => $"{EmailVerificationOtpPrefix}:{NormalizeEmail(email)}";
 
