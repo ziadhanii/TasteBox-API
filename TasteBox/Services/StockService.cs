@@ -13,7 +13,7 @@ public class StockService(ApplicationDbContext context) : IStockService
             await context
                 .Products
                 .Include(product => product.Stock)
-                .FirstOrDefaultAsync(p => p.Id == productId, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == productId && !p.IsDeleted, cancellationToken);
 
         if (product is null)
             return Result.Failure(ProductErrors.ProductNotFound);
@@ -33,7 +33,7 @@ public class StockService(ApplicationDbContext context) : IStockService
             await context
                 .Products
                 .Include(product => product.Stock)
-                .FirstOrDefaultAsync(p => p.Id == productId, cancellationToken);
+                .FirstOrDefaultAsync(p => p.Id == productId && !p.IsDeleted, cancellationToken);
 
         if (product is null)
             return Result.Failure(ProductErrors.ProductNotFound);
@@ -55,7 +55,8 @@ public class StockService(ApplicationDbContext context) : IStockService
         var stock = await context
             .Stock
             .AsNoTracking()
-            .Where(s => s.ProductId == productId)
+            .Include(s => s.Product)
+            .Where(s => s.ProductId == productId && !s.Product.IsDeleted)
             .ProjectToType<StockResponse>()
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -70,7 +71,8 @@ public class StockService(ApplicationDbContext context) : IStockService
         var lowStockProducts = await context
             .Stock
             .AsNoTracking()
-            .Where(s => s.Quantity <= s.MinQuantity)
+            .Include(s => s.Product)
+            .Where(s => s.Quantity <= s.MinQuantity && !s.Product.IsDeleted)
             .ProjectToType<StockResponse>()
             .ToListAsync(cancellationToken);
 

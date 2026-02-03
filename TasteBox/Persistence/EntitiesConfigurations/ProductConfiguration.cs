@@ -27,7 +27,5 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasIndex(p => new { p.CategoryId, p.Name })
             .IsUnique()
             .HasFilter($"[{nameof(ISoftDelete.IsDeleted)}] = 0");
-
-        builder.HasQueryFilter(p => !p.IsDeleted);
     }
 }

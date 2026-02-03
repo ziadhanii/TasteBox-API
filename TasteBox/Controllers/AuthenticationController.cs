@@ -45,6 +45,16 @@ public class AuthenticationController(
         return authResult.IsSuccess ? Ok(authResult.Value) : authResult.ToProblem();
     }
 
+
+    [HttpPost("login-google")]
+    public async Task<IActionResult> LoginWithGoogle(
+        [FromBody] GoogleLoginRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await authService.LoginWithGoogleAsync(request.IdToken, cancellationToken);
+        return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+    }
+
     /// <summary>
     /// Refresh access token using refresh token
     /// </summary>

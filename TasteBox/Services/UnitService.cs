@@ -9,6 +9,7 @@ public class UnitService(ApplicationDbContext context) : IUnitService
     {
         var units = await context.Units
             .AsNoTracking()
+            .Where(u => !u.IsDeleted)
             .ProjectToType<UnitResponse>()
             .ToListAsync(cancellationToken);
 
@@ -20,7 +21,7 @@ public class UnitService(ApplicationDbContext context) : IUnitService
     {
         var units = await context.Units
             .AsNoTracking()
-            .Where(u => u.Type == type)
+            .Where(u => u.Type == type && !u.IsDeleted)
             .ProjectToType<UnitResponse>()
             .ToListAsync(cancellationToken);
 
@@ -31,7 +32,7 @@ public class UnitService(ApplicationDbContext context) : IUnitService
     {
         var unit = await context.Units
             .AsNoTracking()
-            .Where(u => u.Id == id)
+            .Where(u => u.Id == id && !u.IsDeleted)
             .ProjectToType<UnitResponse>()
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -44,13 +45,13 @@ public class UnitService(ApplicationDbContext context) : IUnitService
         CancellationToken cancellationToken = default)
     {
         var nameExists = await context.Units
-            .AnyAsync(u => u.Name == request.Name, cancellationToken);
+            .AnyAsync(u => u.Name == request.Name && !u.IsDeleted, cancellationToken);
 
         if (nameExists)
             return Result.Failure<UnitResponse>(UnitErrors.UnitNameAlreadyExists);
 
         var symbolExists = await context.Units
-            .AnyAsync(u => u.Symbol == request.Symbol, cancellationToken);
+            .AnyAsync(u => u.Symbol == request.Symbol && !u.IsDeleted, cancellationToken);
 
         if (symbolExists)
             return Result.Failure<UnitResponse>(UnitErrors.UnitSymbolAlreadyExists);
@@ -80,13 +81,13 @@ public class UnitService(ApplicationDbContext context) : IUnitService
             return Result.Failure(UnitErrors.UnitNotFound);
 
         var nameExists = await context.Units
-            .AnyAsync(u => u.Name == request.Name && u.Id != id, cancellationToken);
+            .AnyAsync(u => u.Name == request.Name && u.Id != id && !u.IsDeleted, cancellationToken);
 
         if (nameExists)
             return Result.Failure(UnitErrors.UnitNameAlreadyExists);
 
         var symbolExists = await context.Units
-            .AnyAsync(u => u.Symbol == request.Symbol && u.Id != id, cancellationToken);
+            .AnyAsync(u => u.Symbol == request.Symbol && u.Id != id && !u.IsDeleted, cancellationToken);
 
         if (symbolExists)
             return Result.Failure(UnitErrors.UnitSymbolAlreadyExists);
@@ -111,13 +112,13 @@ public class UnitService(ApplicationDbContext context) : IUnitService
     public async Task<Result> ToggleStatusAsync(int id, CancellationToken cancellationToken = default)
     {
         var unit = await context.Units
-            .FindAsync([id], cancellationToken);
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
 
         if (unit is null)
             return Result.Failure(UnitErrors.UnitNotFound);
 
         var isInUse = await context.Products
-            .AnyAsync(p => p.UnitId == id, cancellationToken);
+            .AnyAsync(p => p.UnitId == id && !p.IsDeleted, cancellationToken);
 
         if (isInUse)
             return Result.Failure(UnitErrors.CannotDeactivateUnitInUse);

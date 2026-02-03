@@ -201,4 +201,114 @@ public class UserService(
 
         return Result.Failure(new Error(error.Code, error.Description, StatusCodes.Status400BadRequest));
     }
+
+    public async Task<Result<IEnumerable<AddressResponse>>> GetAddressesAsync(string userId)
+    {
+        var user = await context.Users
+            .Include(u => u.Addresses)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+            return Result.Failure<IEnumerable<AddressResponse>>(UserErrors.UserNotFound);
+
+        var addresses = user.Addresses.Adapt<IEnumerable<AddressResponse>>();
+        return Result.Success(addresses);
+    }
+
+    public async Task<Result<AddressResponse>> AddAddressAsync(
+        string userId,
+        AddressRequest request)
+    {
+        var user = await context.Users
+            .Where(u => u.Id == userId)
+            .Include(u => u.Addresses)
+            .FirstOrDefaultAsync();
+
+        if (user is null)
+            return Result.Failure<AddressResponse>(UserErrors.UserNotFound);
+
+        var address = request.Adapt<Address>();
+
+        if (request.IsDefault && user.Addresses.Count > 0)
+        {
+            foreach (var addr in user.Addresses)
+                addr.IsDefault = false;
+        }
+
+        user.Addresses.Add(address);
+
+        await context.SaveChangesAsync();
+
+        return Result.Success(address.Adapt<AddressResponse>());
+    }
+
+
+    public async Task<Result> UpdateAddressAsync(string userId, int addressId, AddressRequest request)
+    {
+        var user = await context.Users
+            .Include(u => u.Addresses)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+            return Result.Failure(UserErrors.UserNotFound);
+
+        var address = user.Addresses.FirstOrDefault(a => a.Id == addressId);
+
+        if (address is null)
+            return Result.Failure(new Error("Address.NotFound", "Address not found", StatusCodes.Status404NotFound));
+
+        request.Adapt(address);
+
+        if (request.IsDefault)
+        {
+            foreach (var addr in user.Addresses.Where(a => a.Id != addressId))
+                addr.IsDefault = false;
+        }
+
+        await context.SaveChangesAsync();
+        return Result.Success();
+    }
+
+    public async Task<Result> DeleteAddressAsync(string userId, int addressId)
+    {
+        var user = await context.Users
+            .Include(u => u.Addresses)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+            return Result.Failure(UserErrors.UserNotFound);
+
+        var address = user.Addresses.FirstOrDefault(a => a.Id == addressId);
+
+        if (address is null)
+            return Result.Failure(new Error("Address.NotFound", "Address not found", StatusCodes.Status404NotFound));
+
+        user.Addresses.Remove(address);
+        await context.SaveChangesAsync();
+
+        return Result.Success();
+    }
+
+    public async Task<Result> SetDefaultAddressAsync(string userId, int addressId)
+    {
+        var user = await context.Users
+            .Include(u => u.Addresses)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+            return Result.Failure(UserErrors.UserNotFound);
+
+        var address = user.Addresses.FirstOrDefault(a => a.Id == addressId);
+
+        if (address is null)
+            return Result.Failure(new Error("Address.NotFound", "Address not found", StatusCodes.Status404NotFound));
+
+        foreach (var addr in user.Addresses)
+            addr.IsDefault = false;
+
+        address.IsDefault = true;
+        await context.SaveChangesAsync();
+
+        return Result.Success();
+    }
 }

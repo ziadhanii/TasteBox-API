@@ -13,9 +13,11 @@ public class UnitConfiguration : IEntityTypeConfiguration<Unit>
             .HasMaxLength(10);
 
         builder.HasIndex(u => u.Name)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter($"[{nameof(ISoftDelete.IsDeleted)}] = 0");
 
         builder.HasIndex(u => u.Symbol)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter($"[{nameof(ISoftDelete.IsDeleted)}] = 0");
     }
 }

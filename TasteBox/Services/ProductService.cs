@@ -13,7 +13,7 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
     {
         var query = context.Products
             .AsNoTracking()
-            .Where(p => p.CategoryId == categoryId);
+            .Where(p => p.CategoryId == categoryId && !p.IsDeleted);
 
 
         if (!string.IsNullOrWhiteSpace(filters.SearchValue))
@@ -44,7 +44,7 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         CancellationToken cancellationToken = default)
     {
         var product = await context.Products
-            .Where(p => p.Id == id && p.CategoryId == categoryId)
+            .Where(p => p.Id == id && p.CategoryId == categoryId && !p.IsDeleted)
             .ProjectToType<ProductResponse>()
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -59,13 +59,13 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         CancellationToken cancellationToken = default)
     {
         var categoryExists = await context.Categories
-            .AnyAsync(x => x.Id == categoryId, cancellationToken);
+            .AnyAsync(x => x.Id == categoryId && !x.IsDeleted, cancellationToken);
 
         if (!categoryExists)
             return Result.Failure<ProductResponse>(CategoryErrors.CategoryNotFound);
 
         var unitExists = await context.Units
-            .AnyAsync(x => x.Id == request.UnitId, cancellationToken);
+            .AnyAsync(x => x.Id == request.UnitId && !x.IsDeleted, cancellationToken);
 
         if (!unitExists)
             return Result.Failure<ProductResponse>(UnitErrors.UnitNotFound);
@@ -113,7 +113,7 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         CancellationToken cancellationToken = default)
     {
         var product = await context.Products
-            .FirstOrDefaultAsync(p => p.Id == id && p.CategoryId == categoryId, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == id && p.CategoryId == categoryId && !p.IsDeleted, cancellationToken);
 
         if (product is null)
             return Result.Failure(ProductErrors.ProductNotFound);
@@ -121,7 +121,7 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         if (request.UnitId.HasValue)
         {
             var unitExists = await context.Units
-                .AnyAsync(x => x.Id == request.UnitId.Value, cancellationToken);
+                .AnyAsync(x => x.Id == request.UnitId.Value && !x.IsDeleted, cancellationToken);
 
             if (!unitExists)
                 return Result.Failure(UnitErrors.UnitNotFound);
@@ -148,12 +148,14 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         CancellationToken cancellationToken = default)
     {
         var product = await context.Products
-            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(p => p.Id == id && p.CategoryId == categoryId, cancellationToken);
 
         if (product is null)
             return Result.Failure(ProductErrors.ProductNotFound);
+
         product.IsDeleted = !product.IsDeleted;
+        product.DeletedAt = product.IsDeleted ? DateTime.UtcNow : null;
+
         await context.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
@@ -164,6 +166,7 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         // TO DO to implement best-selling logic
         var products = await context.Products
             .AsNoTracking()
+            .Where(p => !p.IsDeleted)
             .ProjectToType<ProductResponse>()
             .ToListAsync(cancellationToken);
         return Result.Success(products);
@@ -181,10 +184,10 @@ public class ProductService(ApplicationDbContext context, IFileService fileServi
         return await context.Products
             .AsNoTracking()
             .Include(p => p.Category)
-            .Where(p =>
-                p.Name.ToLower().Contains(query) ||
+            .Where(p => !p.IsDeleted && !p.Category.IsDeleted &&
+                (p.Name.ToLower().Contains(query) ||
                 p.Description.ToLower().Contains(query) ||
-                p.Category.Name.ToLower().Contains(query)
+                p.Category.Name.ToLower().Contains(query))
             )
             .ProjectToType<ProductResponse>()
             .ToListAsync(cancellationToken);

@@ -1,6 +1,6 @@
 namespace TasteBox.Entities;
 
-public class Product : ISoftDelete
+public class Product : AuditableEntity, ISoftDelete
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -25,4 +25,6 @@ public class Product : ISoftDelete
     public DateTime? DeletedAt { get; set; }
 
     public ICollection<UserFavorite> Favorites { get; set; } = [];
+    public ICollection<CartItem> CartItems { get; set; } = [];
+    public ICollection<OrderItem> OrderItems { get; set; } = [];
 }

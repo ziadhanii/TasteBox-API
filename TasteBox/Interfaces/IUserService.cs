@@ -14,4 +14,10 @@ public interface IUserService
     Task<Result<UserProfileResponse>> GetProfileAsync(string userId);
     Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request);
     Task<Result> ChangePasswordAsync(string userId, ChangePasswordRequest request);
+
+    Task<Result<IEnumerable<AddressResponse>>> GetAddressesAsync(string userId);
+    Task<Result<AddressResponse>> AddAddressAsync(string userId, AddressRequest request);
+    Task<Result> UpdateAddressAsync(string userId, int addressId, AddressRequest request);
+    Task<Result> DeleteAddressAsync(string userId, int addressId);
+    Task<Result> SetDefaultAddressAsync(string userId, int addressId);
 }

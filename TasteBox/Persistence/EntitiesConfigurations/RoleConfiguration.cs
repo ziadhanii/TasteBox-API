@@ -1,6 +1,4 @@
-﻿using TasteBox.Abstractions.Consts;
-
-namespace TasteBox.Persistence.EntitiesConfigurations;
+﻿namespace TasteBox.Persistence.EntitiesConfigurations;
 
 public class RoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
 {
@@ -12,7 +10,9 @@ public class RoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
                 Id = DefaultRoles.AdminRoleId,
                 Name = DefaultRoles.Admin,
                 NormalizedName = DefaultRoles.Admin.ToUpper(),
-                ConcurrencyStamp = DefaultRoles.AdminRoleConcurrencyStamp
+                ConcurrencyStamp = DefaultRoles.AdminRoleConcurrencyStamp,
+                CreatedById = DefaultUsers.AdminId,
+                CreatedOn = DateTime.UtcNow
             },
             new ApplicationRole
             {
@@ -20,7 +20,9 @@ public class RoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
                 Name = DefaultRoles.Customer,
                 NormalizedName = DefaultRoles.Customer.ToUpper(),
                 ConcurrencyStamp = DefaultRoles.CustomerRoleConcurrencyStamp,
-                IsDefault = true
+                IsDefault = true,
+                CreatedById = DefaultUsers.AdminId,
+                CreatedOn = DateTime.UtcNow
             }
         ]);
     }

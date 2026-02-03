@@ -54,4 +54,7 @@ public static class UserErrors
 
     public static readonly Error OtpExpired =
         new("User.OtpExpired", "OTP has expired. Please request a new one", StatusCodes.Status400BadRequest);
+
+    public static readonly Error InvalidGoogleToken =
+        new("User.InvalidGoogleToken", "Invalid Google token", StatusCodes.Status401Unauthorized);
 }
