@@ -16,6 +16,10 @@ appsettings.json
 .appsettings.json
 .appsettings.Development.json
 
+wwwroot/css/
+wwwroot/js/
+
+
 wwwroot/
 uploads/
 PublishProfiles/
