@@ -15,7 +15,10 @@ public class RoleService(RoleManager<ApplicationRole> roleManager, ApplicationDb
 
     public async Task<Result<RoleDetailResponse>> GetAsync(string id)
     {
-        if (await roleManager.FindByIdAsync(id) is not { } role)
+        var role = await roleManager.Roles
+            .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+
+        if (role is null)
             return Result.Failure<RoleDetailResponse>(RoleErrors.RoleNotFound);
 
         var permissions = await roleManager.GetClaimsAsync(role);
@@ -27,7 +30,8 @@ public class RoleService(RoleManager<ApplicationRole> roleManager, ApplicationDb
 
     public async Task<Result<RoleDetailResponse>> AddAsync(RoleRequest request)
     {
-        var roleIsExists = await roleManager.RoleExistsAsync(request.Name);
+        var roleIsExists = await roleManager.Roles
+            .AnyAsync(x => x.Name == request.Name && !x.IsDeleted);
 
         if (roleIsExists)
             return Result.Failure<RoleDetailResponse>(RoleErrors.DuplicatedRole);
@@ -71,12 +75,16 @@ public class RoleService(RoleManager<ApplicationRole> roleManager, ApplicationDb
 
     public async Task<Result> UpdateAsync(string id, RoleRequest request)
     {
-        var roleIsExists = await roleManager.Roles.AnyAsync(x => x.Name == request.Name && x.Id != id);
+        var roleIsExists = await roleManager.Roles
+            .AnyAsync(x => x.Name == request.Name && x.Id != id && !x.IsDeleted);
 
         if (roleIsExists)
             return Result.Failure<RoleDetailResponse>(RoleErrors.DuplicatedRole);
 
-        if (await roleManager.FindByIdAsync(id) is not { } role)
+        var role = await roleManager.Roles
+            .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+
+        if (role is null)
             return Result.Failure<RoleDetailResponse>(RoleErrors.RoleNotFound);
 
         var allowedPermissions = Permissions.GetAllPermissions();
@@ -128,6 +136,7 @@ public class RoleService(RoleManager<ApplicationRole> roleManager, ApplicationDb
             return Result.Failure<RoleDetailResponse>(RoleErrors.RoleNotFound);
 
         role.IsDeleted = !role.IsDeleted;
+        role.DeletedAt = role.IsDeleted ? DateTime.UtcNow : null;
 
         await roleManager.UpdateAsync(role);
 

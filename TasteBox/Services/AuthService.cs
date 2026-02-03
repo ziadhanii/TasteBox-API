@@ -1,7 +1,10 @@
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Options;
 using TasteBox.Abstractions;
 using TasteBox.Helpers;
 using TasteBox.Helpers.CacheData;
+using TasteBox.Settings;
 
 namespace TasteBox.Services;
 
@@ -22,6 +25,48 @@ public sealed class AuthService(
     private const int RateLimitWindowMinutes = 1;
     private const int MaxRequestsPerWindow = 3;
     private const int UsedTokenRetentionMinutes = 1;
+
+    public async Task<Result<AuthResponse>> LoginWithGoogleAsync(string idToken,
+        CancellationToken cancellationToken = default)
+    {
+        var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
+
+        var user = await userManager.FindByEmailAsync(payload.Email);
+
+        if (user is null)
+        {
+            user = new ApplicationUser
+            {
+                Email = payload.Email,
+                UserName = payload.Email.Split('@')[0],
+                FirstName = payload.GivenName ?? "",
+                LastName = payload.FamilyName ?? "",
+                EmailConfirmed = payload.EmailVerified
+            };
+
+            var createResult = await userManager.CreateAsync(user);
+
+            if (!createResult.Succeeded)
+                return Result.Failure<AuthResponse>(CreateIdentityError(createResult).Error);
+
+            await userManager.AddToRoleAsync(user, DefaultRoles.Customer);
+        }
+        else
+        {
+            var validationResult = ValidateUserStatus(user);
+
+            if (!validationResult.IsSuccess)
+                return Result.Failure<AuthResponse>(validationResult.Error);
+
+            if (user.EmailConfirmed || !payload.EmailVerified)
+                return await GenerateAuthResponseAsync(user, cancellationToken);
+
+            user.EmailConfirmed = true;
+            await userManager.UpdateAsync(user);
+        }
+
+        return await GenerateAuthResponseAsync(user, cancellationToken);
+    }
 
     public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
     {

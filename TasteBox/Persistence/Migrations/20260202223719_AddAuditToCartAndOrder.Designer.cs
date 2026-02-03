@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TasteBox.Persistence;
 
@@ -11,9 +12,11 @@ using TasteBox.Persistence;
 namespace TasteBox.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260202223719_AddAuditToCartAndOrder")]
+    partial class AddAuditToCartAndOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -324,7 +327,7 @@ namespace TasteBox.Persistence.Migrations
                             Id = "0197d227-ed75-7ac5-af55-31c2d55797c4",
                             ConcurrencyStamp = "0197d227-ed75-7ac5-af55-31c3691fbcee",
                             CreatedById = "0197d227-ed75-7ac5-af55-31ba464a746d",
-                            CreatedOn = new DateTime(2026, 2, 2, 22, 46, 45, 94, DateTimeKind.Utc).AddTicks(6954),
+                            CreatedOn = new DateTime(2026, 2, 2, 22, 37, 18, 426, DateTimeKind.Utc).AddTicks(4929),
                             IsDefault = false,
                             IsDeleted = false,
                             Name = "Admin",
@@ -335,7 +338,7 @@ namespace TasteBox.Persistence.Migrations
                             Id = "0197d227-ed75-7ac5-af55-31c0e1b6000f",
                             ConcurrencyStamp = "0197d227-ed75-7ac5-af55-31c1246abd3a",
                             CreatedById = "0197d227-ed75-7ac5-af55-31ba464a746d",
-                            CreatedOn = new DateTime(2026, 2, 2, 22, 46, 45, 94, DateTimeKind.Utc).AddTicks(7609),
+                            CreatedOn = new DateTime(2026, 2, 2, 22, 37, 18, 426, DateTimeKind.Utc).AddTicks(5712),
                             IsDefault = true,
                             IsDeleted = false,
                             Name = "Customer",
@@ -434,7 +437,7 @@ namespace TasteBox.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@TASTE-BOX.COM",
                             NormalizedUserName = "ADMIN@TASTE-BOX.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDAJ41pQr8mC1j5GEIn7p1/vKWK8BeICfbTNwg7ovADMHT7nOtzx0TVmRInr20sRqw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMcR7DeFGmsWa/cjKsIG4ZIj5YQeCTn58+8PL1Z/29moLu0arW3epLujLEbl02tEUA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -450,11 +453,27 @@ namespace TasteBox.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CreatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -562,6 +581,12 @@ namespace TasteBox.Persistence.Migrations
                     b.Property<DateTime?>("ConfirmedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CreatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("DeliveredAt")
                         .HasColumnType("datetime2");
 
@@ -630,11 +655,19 @@ namespace TasteBox.Persistence.Migrations
                         .HasPrecision(18, 3)
                         .HasColumnType("decimal(18,3)");
 
+                    b.Property<string>("UpdatedById")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("OrderDate");
 
@@ -642,6 +675,8 @@ namespace TasteBox.Persistence.Migrations
                         .IsUnique();
 
                     b.HasIndex("Status");
+
+                    b.HasIndex("UpdatedById");
 
                     b.HasIndex("UserId");
 
@@ -1037,11 +1072,25 @@ namespace TasteBox.Persistence.Migrations
 
             modelBuilder.Entity("TasteBox.Entities.Cart", b =>
                 {
+                    b.HasOne("TasteBox.Entities.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TasteBox.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("TasteBox.Entities.ApplicationUser", "User")
                         .WithOne("Cart")
                         .HasForeignKey("TasteBox.Entities.Cart", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
 
                     b.Navigation("User");
                 });
@@ -1069,11 +1118,13 @@ namespace TasteBox.Persistence.Migrations
                 {
                     b.HasOne("TasteBox.Entities.ApplicationUser", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TasteBox.Entities.ApplicationUser", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 
@@ -1082,11 +1133,25 @@ namespace TasteBox.Persistence.Migrations
 
             modelBuilder.Entity("TasteBox.Entities.Order", b =>
                 {
+                    b.HasOne("TasteBox.Entities.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("TasteBox.Entities.ApplicationUser", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("TasteBox.Entities.ApplicationUser", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
 
                     b.Navigation("User");
                 });
@@ -1120,7 +1185,8 @@ namespace TasteBox.Persistence.Migrations
 
                     b.HasOne("TasteBox.Entities.ApplicationUser", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TasteBox.Entities.Unit", "Unit")
                         .WithMany()
@@ -1130,7 +1196,8 @@ namespace TasteBox.Persistence.Migrations
 
                     b.HasOne("TasteBox.Entities.ApplicationUser", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
 
@@ -1156,11 +1223,13 @@ namespace TasteBox.Persistence.Migrations
                 {
                     b.HasOne("TasteBox.Entities.ApplicationUser", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TasteBox.Entities.ApplicationUser", "UpdatedBy")
                         .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 

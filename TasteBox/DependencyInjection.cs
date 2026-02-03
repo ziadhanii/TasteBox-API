@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
 
         services.Configure<MailSettings>(configuration.GetSection(nameof(MailSettings)));
+        services.Configure<GoogleAuthSettings>(configuration.GetSection(GoogleAuthSettings.SectionName));
 
         services.AddCacheServices(configuration);
 
@@ -172,7 +173,7 @@ public static class DependencyInjection
                 });
 
             options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-                { [new OpenApiSecuritySchemeReference("bearer", document)] = [] });
+            { [new OpenApiSecuritySchemeReference("bearer", document)] = [] });
         });
         return services;
     }

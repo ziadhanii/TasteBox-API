@@ -1,6 +1,6 @@
 namespace TasteBox.Controllers;
 
-[Authorize]
+[Authorize(Roles = DefaultRoles.Customer)]
 [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
 public class FavoritesController(IUserFavoritesService favoritesService) : APIBaseController
 {

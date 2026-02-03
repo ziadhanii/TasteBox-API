@@ -10,6 +10,7 @@ public class CategoryService(ApplicationDbContext context, IFileService fileServ
     public async Task<IEnumerable<CategoryResponse>> GetAllAsync(CancellationToken cancellationToken = default)
         => await context.Categories
             .AsNoTracking()
+            .Where(c => !c.IsDeleted)
             .ProjectToType<CategoryResponse>()
             .ToListAsync(cancellationToken);
 
@@ -18,7 +19,7 @@ public class CategoryService(ApplicationDbContext context, IFileService fileServ
         CancellationToken cancellationToken = default)
     {
         var category = await context.Categories
-            .Where(c => c.Id == id)
+            .Where(c => c.Id == id && !c.IsDeleted)
             .ProjectToType<CategoryWithProductsResponse>()
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -32,7 +33,7 @@ public class CategoryService(ApplicationDbContext context, IFileService fileServ
         CancellationToken cancellationToken = default)
     {
         var isExistingName =
-            await context.Categories.AnyAsync(x => x.Name == request.Name, cancellationToken: cancellationToken);
+            await context.Categories.AnyAsync(x => x.Name == request.Name && !x.IsDeleted, cancellationToken: cancellationToken);
 
         if (isExistingName)
             return Result.Failure<CategoryResponse>(CategoryErrors.DuplicatedCategoryTitle);
@@ -65,13 +66,13 @@ public class CategoryService(ApplicationDbContext context, IFileService fileServ
         CancellationToken cancellationToken = default)
     {
         var category = await context.Categories
-            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted, cancellationToken);
 
         if (category is null)
             return Result.Failure(CategoryErrors.CategoryNotFound);
 
         var isExistingName = await context.Categories
-            .AnyAsync(x => x.Name == request.Name && x.Id != id, cancellationToken: cancellationToken);
+            .AnyAsync(x => x.Name == request.Name && x.Id != id && !x.IsDeleted, cancellationToken: cancellationToken);
 
         if (isExistingName)
             return Result.Failure(CategoryErrors.DuplicatedCategoryTitle);
@@ -107,7 +108,6 @@ public class CategoryService(ApplicationDbContext context, IFileService fileServ
     public async Task<Result> ToggleStatusAsync(int id, CancellationToken cancellationToken = default)
     {
         var category = await context.Categories
-            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
 
         if (category is null)

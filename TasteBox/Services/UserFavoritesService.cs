@@ -12,6 +12,7 @@ public class UserFavoritesService(ApplicationDbContext context) : IUserFavorites
             .AsNoTracking()
             .Where(uf => uf.UserId == userId)
             .Select(uf => uf.Product)
+            .Where(p => !p.IsDeleted)
             .ProjectToType<ProductResponse>()
             .ToListAsync(cancellationToken);
     }
@@ -23,7 +24,7 @@ public class UserFavoritesService(ApplicationDbContext context) : IUserFavorites
     {
         var productExists = await context.Products
             .AsNoTracking()
-            .AnyAsync(p => p.Id == productId, cancellationToken);
+            .AnyAsync(p => p.Id == productId && !p.IsDeleted, cancellationToken);
 
         if (!productExists)
             return Result.Failure(ProductErrors.ProductNotFound);

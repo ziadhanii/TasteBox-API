@@ -7,6 +7,9 @@ public interface IAuthService
     Task<Result<AuthResponse>> LoginAsync(string email, string password,
         CancellationToken cancellationToken = default);
 
+    Task<Result<AuthResponse>> LoginWithGoogleAsync(string idToken,
+        CancellationToken cancellationToken = default);
+
     Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default);
 
     Task<Result<AuthResponse>> RefreshAccessTokenAsync(string token, string refreshToken,
