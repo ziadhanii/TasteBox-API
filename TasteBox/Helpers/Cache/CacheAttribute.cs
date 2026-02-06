@@ -1,7 +1,7 @@
 namespace TasteBox.Helpers.Cache;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class CacheAttribute(int timeToLiveSeconds) : Attribute, IAsyncActionFilter
+public class CacheAttribute(int TimeToLiveMinutes) : Attribute, IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -31,7 +31,7 @@ public class CacheAttribute(int timeToLiveSeconds) : Attribute, IAsyncActionFilt
             if (okObjectResult.Value != null)
             {
                 await cacheService.CacheResponseAsync(cacheKey, okObjectResult.Value,
-                    TimeSpan.FromSeconds(timeToLiveSeconds));
+                    TimeSpan.FromMinutes(TimeToLiveMinutes));
             }
         }
     }

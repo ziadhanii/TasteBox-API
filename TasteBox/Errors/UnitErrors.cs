@@ -16,6 +16,9 @@ public class UnitErrors
     public static readonly Error CannotDeactivateUnitInUse =
         new("Unit.InUse", "Cannot deactivate unit that is currently in use", StatusCodes.Status400BadRequest);
 
+    public static readonly Error CannotDeleteUnitInUse =
+        new("Unit.CannotDelete", "Cannot delete unit that is currently in use by products", StatusCodes.Status400BadRequest);
+
     public static readonly Error InvalidConversionFactor =
         new("Unit.InvalidFactor", "Conversion factor must be greater than zero", StatusCodes.Status400BadRequest);
 

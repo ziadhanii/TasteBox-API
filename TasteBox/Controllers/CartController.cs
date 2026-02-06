@@ -5,7 +5,7 @@ namespace TasteBox.Controllers;
 public class CartController(ICartService cartService) : APIBaseController
 {
     [HttpGet("")]
-    [Cache(300)]
+    [Cache(60)]
     public async Task<IActionResult> GetCart(CancellationToken cancellationToken)
     {
         var result = await cartService.GetCartAsync(User.GetUserId()!, cancellationToken);
@@ -48,7 +48,7 @@ public class CartController(ICartService cartService) : APIBaseController
     }
 
     [HttpGet("items/count")]
-    [Cache(300)]
+    [Cache(60)]
     public async Task<IActionResult> GetCartItemsCount(CancellationToken cancellationToken)
     {
         var count = await cartService.GetCartItemsCountAsync(User.GetUserId()!, cancellationToken);
