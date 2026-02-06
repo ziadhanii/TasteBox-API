@@ -37,4 +37,5 @@ public class StockController(IStockService stockService) : ControllerBase
         var result = await stockService.GetLowStockProductsAsync(cancellationToken);
         return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
     }
+
 }
