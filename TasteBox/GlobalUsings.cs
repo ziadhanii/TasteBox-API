@@ -35,3 +35,7 @@ global using TasteBox.Contracts.Roles;
 global using TasteBox.Helpers;
 global using TasteBox.Helpers.Cache;
 global using Microsoft.AspNetCore.Mvc.Filters;
+global using Microsoft.Extensions.Options;
+global using TasteBox.Abstractions;
+global using TasteBox.Contracts.Order;
+global using TasteBox.Settings;
