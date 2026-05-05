@@ -14,11 +14,11 @@ public static class ScalarExtensions
                 .AlwaysShowDeveloperTools()
                 .HideModels = false;
 
-            options.AddDocument(ApiDocuments.Dashboard, "Dashboard",
-                $"/swagger/{ApiDocuments.Dashboard}/swagger.json");
+            options.AddDocument(APIDocuments.Dashboard, "Dashboard",
+                $"/swagger/{APIDocuments.Dashboard}/swagger.json");
 
-            options.AddDocument(ApiDocuments.Mobile, "Mobile",
-                $"/swagger/{ApiDocuments.Mobile}/swagger.json");
+            options.AddDocument(APIDocuments.Mobile, "Mobile",
+                $"/swagger/{APIDocuments.Mobile}/swagger.json");
 
             options.AddPreferredSecuritySchemes("bearer")
                 .AddHttpAuthentication("bearer", auth =>

@@ -17,7 +17,7 @@ namespace TasteBox.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -107,77 +107,56 @@ namespace TasteBox.Persistence.Migrations
                         {
                             Id = 9,
                             ClaimType = "permissions",
-                            ClaimValue = "stock:read",
+                            ClaimValue = "users:read",
                             RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
                         },
                         new
                         {
                             Id = 10,
                             ClaimType = "permissions",
-                            ClaimValue = "stock:add",
+                            ClaimValue = "users:add",
                             RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
                         },
                         new
                         {
                             Id = 11,
                             ClaimType = "permissions",
-                            ClaimValue = "stock:update",
+                            ClaimValue = "users:update",
                             RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
                         },
                         new
                         {
                             Id = 12,
                             ClaimType = "permissions",
-                            ClaimValue = "stock:delete",
+                            ClaimValue = "roles:read",
                             RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
                         },
                         new
                         {
                             Id = 13,
                             ClaimType = "permissions",
-                            ClaimValue = "users:read",
+                            ClaimValue = "roles:add",
                             RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
                         },
                         new
                         {
                             Id = 14,
                             ClaimType = "permissions",
-                            ClaimValue = "users:add",
+                            ClaimValue = "roles:update",
                             RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
                         },
                         new
                         {
                             Id = 15,
                             ClaimType = "permissions",
-                            ClaimValue = "users:update",
+                            ClaimValue = "orders:read",
                             RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
                         },
                         new
                         {
                             Id = 16,
                             ClaimType = "permissions",
-                            ClaimValue = "roles:read",
-                            RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            ClaimType = "permissions",
-                            ClaimValue = "roles:add",
-                            RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            ClaimType = "permissions",
-                            ClaimValue = "roles:update",
-                            RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
-                        },
-                        new
-                        {
-                            Id = 19,
-                            ClaimType = "permissions",
-                            ClaimValue = "results:read",
+                            ClaimValue = "orders:update",
                             RoleId = "0197d227-ed75-7ac5-af55-31c2d55797c4"
                         });
                 });
@@ -324,7 +303,7 @@ namespace TasteBox.Persistence.Migrations
                             Id = "0197d227-ed75-7ac5-af55-31c2d55797c4",
                             ConcurrencyStamp = "0197d227-ed75-7ac5-af55-31c3691fbcee",
                             CreatedById = "0197d227-ed75-7ac5-af55-31ba464a746d",
-                            CreatedOn = new DateTime(2026, 2, 2, 22, 46, 45, 94, DateTimeKind.Utc).AddTicks(6954),
+                            CreatedOn = new DateTime(2026, 4, 28, 16, 14, 0, 397, DateTimeKind.Utc).AddTicks(3346),
                             IsDefault = false,
                             IsDeleted = false,
                             Name = "Admin",
@@ -335,7 +314,7 @@ namespace TasteBox.Persistence.Migrations
                             Id = "0197d227-ed75-7ac5-af55-31c0e1b6000f",
                             ConcurrencyStamp = "0197d227-ed75-7ac5-af55-31c1246abd3a",
                             CreatedById = "0197d227-ed75-7ac5-af55-31ba464a746d",
-                            CreatedOn = new DateTime(2026, 2, 2, 22, 46, 45, 94, DateTimeKind.Utc).AddTicks(7609),
+                            CreatedOn = new DateTime(2026, 4, 28, 16, 14, 0, 397, DateTimeKind.Utc).AddTicks(4053),
                             IsDefault = true,
                             IsDeleted = false,
                             Name = "Customer",
@@ -434,7 +413,7 @@ namespace TasteBox.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@TASTE-BOX.COM",
                             NormalizedUserName = "ADMIN@TASTE-BOX.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDAJ41pQr8mC1j5GEIn7p1/vKWK8BeICfbTNwg7ovADMHT7nOtzx0TVmRInr20sRqw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGk0oIGJW2kkkb2X3MPHMi6nvQq33puy2iZ93del0+etnJ8bfWgtYo8uZ2X+BCYurQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -548,6 +527,33 @@ namespace TasteBox.Persistence.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("TasteBox.Entities.GeoLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Governorate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GeoLocations");
+                });
+
             modelBuilder.Entity("TasteBox.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -581,10 +587,13 @@ namespace TasteBox.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime?>("OutForDeliveryAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ShippedAt")
+                    b.Property<DateTime?>("PreparingAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ShippingAddress")
@@ -864,6 +873,35 @@ namespace TasteBox.Persistence.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("Units");
+                });
+
+            modelBuilder.Entity("TasteBox.Entities.UserDevice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FcmToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FcmToken")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDevice");
                 });
 
             modelBuilder.Entity("TasteBox.Entities.UserFavorite", b =>
@@ -1165,6 +1203,17 @@ namespace TasteBox.Persistence.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("TasteBox.Entities.UserDevice", b =>
+                {
+                    b.HasOne("TasteBox.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TasteBox.Entities.UserFavorite", b =>

@@ -1,31 +1,38 @@
-using Microsoft.AspNetCore.Mvc.Filters;
-
 namespace TasteBox.Helpers.Cache;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class InvalidateCacheAttribute : Attribute, IAsyncActionFilter
+public class InvalidateCacheAttribute(params string[] keyNamespaces) : Attribute, IAsyncActionFilter
 {
-    private readonly string _pattern;
-
-    public InvalidateCacheAttribute(string pattern)
-    {
-        _pattern = pattern;
-    }
-
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var resultContext = await next();
 
-        if (resultContext.Exception == null || resultContext.ExceptionHandled)
+        if (ShouldInvalidate(resultContext))
         {
             var cacheService = context.HttpContext.RequestServices.GetRequiredService<ICacheService>();
+            var namespacesToInvalidate = keyNamespaces.Length == 0 ? [] : keyNamespaces;
 
-            // Add user ID to pattern to invalidate user-specific cache
-            var userId = context.HttpContext.User.GetUserId();
-            var userPattern = !string.IsNullOrEmpty(userId) ? $"user:{userId}" : "";
-
-            var datePattern = $"{_pattern}_{userPattern}_{DateTime.UtcNow.Date:yyyyMMdd}";
-            await cacheService.RemoveCacheByPatternAsync(datePattern);
+            foreach (var keyNamespace in namespacesToInvalidate)
+            {
+                var pattern = CacheRequestResolver.CreateUserScopedPattern(context.HttpContext, keyNamespace);
+                await cacheService.RemoveCacheByPatternAsync(pattern);
+            }
         }
+    }
+
+    private static bool ShouldInvalidate(ActionExecutedContext context)
+    {
+        if (context.Exception is not null && !context.ExceptionHandled)
+            return false;
+
+        return context.Result switch
+        {
+            OkObjectResult => true,
+            OkResult => true,
+            NoContentResult => true,
+            ObjectResult { StatusCode: >= 200 and < 300 } => true,
+            StatusCodeResult { StatusCode: >= 200 and < 300 } => true,
+            _ => false
+        };
     }
 }

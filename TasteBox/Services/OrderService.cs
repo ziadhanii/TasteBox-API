@@ -1,21 +1,24 @@
+using TasteBox.Contracts.Notification;
+
 namespace TasteBox.Services;
 
 public class OrderService(
     ApplicationDbContext context,
     IOptions<OrderSettings> orderSettings,
-    ILogger<OrderService> logger) : IOrderService
+    ILogger<OrderService> logger,
+    INotificationSender notificationSender) : IOrderService
 {
     private readonly OrderSettings _orderSettings = orderSettings.Value;
 
     private static readonly Dictionary<OrderStatus, OrderStatus[]> AllowedTransitions = new()
     {
         { OrderStatus.Pending, [OrderStatus.Confirmed, OrderStatus.Cancelled] },
-        { OrderStatus.Confirmed, [OrderStatus.Shipped, OrderStatus.Cancelled] },
-        { OrderStatus.Shipped, [OrderStatus.Delivered] },
+        { OrderStatus.Confirmed, [OrderStatus.Preparing, OrderStatus.Cancelled] },
+        { OrderStatus.Preparing, [OrderStatus.OutForDelivery] },
+        { OrderStatus.OutForDelivery, [OrderStatus.Delivered] },
         { OrderStatus.Delivered, [] },
         { OrderStatus.Cancelled, [] }
     };
-
 
     public async Task<Result<OrderResponse>> CreateOrderAsync(
         string userId,
@@ -77,9 +80,7 @@ public class OrderService(
                 order.OrderNumber,
                 userId);
 
-            var orderResponse = order.Adapt<OrderResponse>();
-
-            return Result.Success(orderResponse);
+            return Result.Success(order.Adapt<OrderResponse>());
         }
         catch (Exception ex)
         {
@@ -89,6 +90,26 @@ public class OrderService(
         }
     }
 
+    public async Task<Result<OrderTrackingResponse>> GetOrderTrackingAsync(
+        string userId,
+        int orderId,
+        CancellationToken cancellationToken = default)
+    {
+        var order = await context.Orders
+            .AsNoTracking()
+            .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId, cancellationToken);
+
+        if (order is null)
+            return Result.Failure<OrderTrackingResponse>(OrderErrors.OrderNotFound);
+
+        var response = new OrderTrackingResponse(
+            order.Id,
+            order.Status,
+            order.GetTimeline()
+        );
+
+        return Result.Success(response);
+    }
 
     public async Task<Result<OrderResponse>> GetOrderByIdAsync(
         string userId,
@@ -106,7 +127,6 @@ public class OrderService(
             : Result.Success(order);
     }
 
-
     public async Task<Result<IEnumerable<OrderSummaryResponse>>> GetUserOrdersAsync(
         string userId,
         CancellationToken cancellationToken = default)
@@ -121,7 +141,6 @@ public class OrderService(
         return Result.Success<IEnumerable<OrderSummaryResponse>>(orders);
     }
 
-
     public async Task<Result<IEnumerable<OrderSummaryResponse>>> GetAllOrdersAsync(
         CancellationToken cancellationToken = default)
     {
@@ -133,7 +152,6 @@ public class OrderService(
 
         return Result.Success<IEnumerable<OrderSummaryResponse>>(orders);
     }
-
 
     public async Task<Result> CancelOrderAsync(
         string userId,
@@ -196,7 +214,6 @@ public class OrderService(
         }
     }
 
-
     public async Task<Result> UpdateOrderStatusAsync(
         int orderId,
         UpdateOrderStatusRequest request,
@@ -214,11 +231,15 @@ public class OrderService(
 
         await context.SaveChangesAsync(cancellationToken);
 
+        await notificationSender.SendToUserAsync(order.UserId, new SendNotificationRequest
+        {
+            Title = "Order Update 📦",
+            Body = $"Your order is now {order.Status}"
+        });
         logger.LogInformation("Order {OrderId} status updated to {Status}", orderId, request.Status);
 
         return Result.Success();
     }
-
 
     private async Task<Result<Cart>> GetUserCartAsync(string userId, CancellationToken cancellationToken)
     {
@@ -234,14 +255,12 @@ public class OrderService(
         return Result.Success(cart);
     }
 
-
-    private Result ValidateStock(ICollection<CartItem> cartItems)
+    private static Result ValidateStock(ICollection<CartItem> cartItems)
     {
         return cartItems.Any(ci => ci.Product.Stock.Quantity < ci.Quantity)
             ? Result.Failure(OrderErrors.InsufficientStock)
             : Result.Success();
     }
-
 
     private Order CreateOrderEntity(string userId, Cart cart, Address address, CreateOrderRequest request)
     {
@@ -280,8 +299,7 @@ public class OrderService(
         };
     }
 
-
-    private void DeductStock(ICollection<CartItem> cartItems)
+    private static void DeductStock(ICollection<CartItem> cartItems)
     {
         foreach (var cartItem in cartItems)
         {

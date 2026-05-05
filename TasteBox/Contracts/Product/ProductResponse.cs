@@ -2,6 +2,7 @@ namespace TasteBox.Contracts.Product;
 
 public record ProductResponse(
     int Id,
+    int CategoryId,
     string Name,
     string Description,
     string ImageUrl,

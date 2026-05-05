@@ -1,8 +1,3 @@
-using TasteBox.Abstractions;
-using TasteBox.Errors;
-using TasteBox.Utilities;
-using TasteBox.Utilities.File;
-
 namespace TasteBox.Services;
 
 public class CategoryService(ApplicationDbContext context, IFileService fileService) : ICategoryService
@@ -33,7 +28,8 @@ public class CategoryService(ApplicationDbContext context, IFileService fileServ
         CancellationToken cancellationToken = default)
     {
         var isExistingName =
-            await context.Categories.AnyAsync(x => x.Name == request.Name && !x.IsDeleted, cancellationToken: cancellationToken);
+            await context.Categories.AnyAsync(x => x.Name == request.Name && !x.IsDeleted,
+                cancellationToken: cancellationToken);
 
         if (isExistingName)
             return Result.Failure<CategoryResponse>(CategoryErrors.DuplicatedCategoryTitle);

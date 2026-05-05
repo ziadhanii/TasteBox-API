@@ -2,7 +2,7 @@ using TasteBox.Contracts.Unit;
 
 namespace TasteBox.Controllers;
 
-[ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+[ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
 public class UnitsController(IUnitService unitService) : APIBaseController
 {
     [HttpGet("")]

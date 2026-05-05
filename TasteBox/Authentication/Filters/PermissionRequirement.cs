@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-
-namespace TasteBox.Authentication.Filters;
+﻿namespace TasteBox.Authentication.Filters;
 
 public class PermissionRequirement(string permission) : IAuthorizationRequirement
 {

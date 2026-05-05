@@ -2,30 +2,72 @@ namespace TasteBox.Helpers;
 
 public static class CacheKeys
 {
-    private const string EmailVerificationOtpPrefix = "email_verification:otp";
-    private const string EmailVerificationRateLimitPrefix = "email_verification:rate_limit";
+    private const string Prefix = "tb";
+    private const string Version = "v1";
 
-    private const string PasswordResetOtpPrefix = "password_reset:otp";
-    private const string PasswordResetTokenPrefix = "password_reset:token";
-    private const string PasswordResetRateLimitPrefix = "password_reset:rate_limit";
-
-    public const string CartPattern = "/api/v1/cart";
+    public const string Cart = Prefix + ":" + Version + ":cart";
+    public const string CartItemsCount = Prefix + ":" + Version + ":cart:items-count";
+    public const string Products = Prefix + ":" + Version + ":products";
+    public const string Orders = Prefix + ":" + Version + ":orders";
 
     public static string EmailVerificationOtp(string email)
-        => $"{EmailVerificationOtpPrefix}:{NormalizeEmail(email)}";
+        => $"{Prefix}:{Version}:auth:email_verification:otp:{Normalize(email)}";
 
     public static string EmailVerificationRateLimit(string email)
-        => $"{EmailVerificationRateLimitPrefix}:{NormalizeEmail(email)}";
+        => $"{Prefix}:{Version}:auth:email_verification:rate_limit:{Normalize(email)}";
 
     public static string PasswordResetOtp(string email)
-        => $"{PasswordResetOtpPrefix}:{NormalizeEmail(email)}";
+        => $"{Prefix}:{Version}:auth:password_reset:otp:{Normalize(email)}";
 
     public static string PasswordResetToken(string email)
-        => $"{PasswordResetTokenPrefix}:{NormalizeEmail(email)}";
+        => $"{Prefix}:{Version}:auth:password_reset:token:{Normalize(email)}";
 
     public static string PasswordResetRateLimit(string email)
-        => $"{PasswordResetRateLimitPrefix}:{NormalizeEmail(email)}";
+        => $"{Prefix}:{Version}:auth:password_reset:rate_limit:{Normalize(email)}";
 
-    private static string NormalizeEmail(string email)
-        => email.ToLowerInvariant();
+    public static string CartKey(string userId)
+        => BuildUserScopedKey(Cart, userId);
+
+    public static string CartPattern(string userId)
+        => BuildUserScopedPattern(Cart, userId);
+
+    public static string CartItemsCountKey(string userId)
+        => BuildUserScopedKey(CartItemsCount, userId);
+
+    public static string CartItemsCountPattern(string userId)
+        => BuildUserScopedPattern(CartItemsCount, userId);
+
+    public static string ProductsPattern()
+        => $"{Products}*";
+
+    public static string OrdersKey(string userId)
+        => BuildUserScopedKey(Orders, userId);
+
+    public static string OrdersPattern(string userId)
+        => BuildUserScopedPattern(Orders, userId);
+
+    public static string BuildUserScopedKey(string keyNamespace, string userId)
+        => $"{keyNamespace}:user:{userId}";
+
+    public static string BuildUserScopedKey(string keyNamespace, string userId, IQueryCollection query)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(keyNamespace);
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+        ArgumentNullException.ThrowIfNull(query);
+
+        var builder = new StringBuilder(BuildUserScopedKey(keyNamespace, userId));
+
+        foreach (var (key, value) in query.OrderBy(entry => entry.Key))
+        {
+            builder.Append($"|{key}-{value}");
+        }
+
+        return builder.ToString();
+    }
+
+    public static string BuildUserScopedPattern(string keyNamespace, string userId)
+        => $"{BuildUserScopedKey(keyNamespace, userId)}*";
+
+    private static string Normalize(string value)
+        => value.Trim().ToLowerInvariant();
 }

@@ -1,18 +1,15 @@
 namespace TasteBox.Controllers;
 
-[Authorize]
 public class CategoriesController(ICategoryService categoryService) : APIBaseController
 {
     [HttpGet("")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
-    [HasPermission(Permissions.GetCategories)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         => Ok(await categoryService.GetAllAsync(cancellationToken));
 
 
     [HttpGet("{id}")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
-    [HasPermission(Permissions.GetCategories)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
     {
         var result = await categoryService.GetAsync(id, cancellationToken);
@@ -21,7 +18,7 @@ public class CategoriesController(ICategoryService categoryService) : APIBaseCon
     }
 
     [HttpPost("")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
     [HasPermission(Permissions.AddCategories)]
     public async Task<IActionResult> Add([FromForm] CreateCategoryRequest request,
         CancellationToken cancellationToken)
@@ -34,7 +31,7 @@ public class CategoriesController(ICategoryService categoryService) : APIBaseCon
     }
 
     [HttpPut("{id}")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
     [HasPermission(Permissions.UpdateCategories)]
     public async Task<IActionResult> Update([FromRoute] int id, [FromForm] UpdateCategoryRequest request,
         CancellationToken cancellationToken)
@@ -44,7 +41,7 @@ public class CategoriesController(ICategoryService categoryService) : APIBaseCon
     }
 
     [HttpPut("{id}/toggleStatus")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
     [HasPermission(Permissions.DeleteCategories)]
     public async Task<IActionResult> ToggleStatus([FromRoute] int id, CancellationToken cancellationToken)
     {

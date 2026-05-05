@@ -18,9 +18,6 @@ public record OrderResponse(
     string? ShippingPhone,
     string? Notes,
     DateTime OrderDate,
-    DateTime? ConfirmedAt,
-    DateTime? ShippedAt,
-    DateTime? DeliveredAt,
-    DateTime? CancelledAt,
-    IEnumerable<OrderItemResponse> OrderItems
+    IEnumerable<OrderItemResponse> OrderItems,
+    IEnumerable<OrderStatusStep> Timeline
 );

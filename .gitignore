@@ -1,29 +1,46 @@
+# =========================
+# Build
+# =========================
 bin/
 obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
 
+# =========================
+# IDE / Editors
+# =========================
 .vs/
 .idea/
-.github/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+riderModule.iml
+_ReSharper.Caches/
 
-.vs
-.idea
-.github
+# Packages
+packages/
 
-appsettings.json
-.appsettings.json
-.appsettings.Development.json
+# Sensitive Config (DO NOT PUSH)
+appsettings.Development.json
+appsettings.Production.json
 
-wwwroot/css/
-wwwroot/js/
+TasteBox/appsettings.Development.json
+TasteBox/appsettings.Production.json
 
+# Firebase / Service Account Keys
+*.json
+!appsettings.json
+!appsettings.example.json
+!TasteBox/appsettings.json
+!TasteBox/appsettings.example.json
 
-wwwroot/
+# Uploads / Generated Files
+wwwroot/uploads/
 uploads/
-PublishProfiles/
 
+# Publish Profiles (Secrets)
+Properties/PublishProfiles/
+TasteBox/Properties/PublishProfiles/
 
+# Misc
 PROJECT_DOCUMENTATION.md
 .config

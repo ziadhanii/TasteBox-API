@@ -84,7 +84,7 @@ public sealed class CacheService(IDistributedCache cache, IConnectionMultiplexer
         {
             var server = connectionMultiplexer.GetServer(endpoint);
 
-            var keys = server.Keys(pattern: $"*{pattern}*").ToArray();
+            var keys = server.Keys(pattern: pattern).ToArray();
 
             if (keys.Length > 0)
             {

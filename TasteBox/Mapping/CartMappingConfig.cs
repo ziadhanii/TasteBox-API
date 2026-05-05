@@ -5,10 +5,14 @@ public class CartMappingConfig : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<CartItem, CartItemResponse>()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.ProductId, src => src.ProductId)
             .Map(dest => dest.ProductName, src => src.Product.Name)
             .Map(dest => dest.ProductImage, src => src.Product.ImageUrl)
+            .Map(dest => dest.Quantity, src => src.Quantity)
             .Map(dest => dest.UnitPrice, src => src.Product.UnitPrice)
             .Map(dest => dest.DiscountedPrice, src => src.Product.DiscountedPrice)
+            .Map(dest => dest.Price, src => src.Price)
             .Map(dest => dest.Subtotal, src => src.Quantity * src.Price)
             .Map(dest => dest.UnitName, src => src.Product.Unit.Name)
             .Map(dest => dest.UnitSymbol, src => src.Product.Unit.Symbol)
@@ -18,10 +22,15 @@ public class CartMappingConfig : IRegister
             .Map(dest => dest.MaxOrderQty, src => src.Product.MaxOrderQty);
 
         config.NewConfig<Cart, CartResponse>()
-            .Map(dest => dest.Items, src => src.CartItems.Where(ci => !ci.Product.IsDeleted))
-            .Map(dest => dest.ItemsCount, src => src.CartItems.Count(ci => !ci.Product.IsDeleted))
-            .Map(dest => dest.TotalAmount, src => src.CartItems
-                .Where(ci => !ci.Product.IsDeleted)
-                .Sum(ci => ci.Quantity * ci.Price));
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.UserId, src => src.UserId)
+            .Map(dest => dest.Items,
+                src => src.CartItems.Where(ci => !ci.Product.IsDeleted))
+            .Map(dest => dest.ItemsCount,
+                src => src.CartItems.Count(ci => !ci.Product.IsDeleted))
+            .Map(dest => dest.TotalAmount,
+                src => src.CartItems
+                    .Where(ci => !ci.Product.IsDeleted)
+                    .Sum(ci => ci.Quantity * ci.Price));
     }
 }

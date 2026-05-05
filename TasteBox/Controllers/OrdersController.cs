@@ -6,7 +6,7 @@ namespace TasteBox.Controllers;
 public class OrdersController(IOrderService orderService) : ControllerBase
 {
     [HttpGet("payment-method")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     public IActionResult GetPaymentMethods()
     {
         var paymentMethods = Enum.GetValues<PaymentMethod>()
@@ -19,7 +19,8 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     }
 
     [HttpPost]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [InvalidateCache(CacheKeys.Cart, CacheKeys.CartItemsCount)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     [Authorize(Roles = DefaultRoles.Customer)]
     public async Task<IActionResult> CreateOrder(
         [FromBody] CreateOrderRequest request,
@@ -32,7 +33,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     [Authorize(Roles = DefaultRoles.Customer)]
     public async Task<IActionResult> GetOrder([FromRoute] int id, CancellationToken cancellationToken)
     {
@@ -41,7 +42,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     }
 
     [HttpGet]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     [Authorize(Roles = DefaultRoles.Customer)]
     public async Task<IActionResult> GetMyOrders(CancellationToken cancellationToken)
     {
@@ -50,7 +51,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     }
 
     [HttpPut("{id}/cancel")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     [Authorize(Roles = DefaultRoles.Customer)]
     public async Task<IActionResult> CancelOrder([FromRoute] int id, CancellationToken cancellationToken)
     {
@@ -59,7 +60,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     }
 
     [HttpGet("all")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
     [HasPermission(Permissions.GetOrders)]
     public async Task<IActionResult> GetAllOrders(CancellationToken cancellationToken)
     {
@@ -68,7 +69,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     }
 
     [HttpPut("{id}/status")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
     [HasPermission(Permissions.UpdateOrders)]
     public async Task<IActionResult> UpdateOrderStatus(
         [FromRoute] int id,
@@ -77,5 +78,14 @@ public class OrdersController(IOrderService orderService) : ControllerBase
     {
         var result = await orderService.UpdateOrderStatusAsync(id, request, cancellationToken);
         return result.IsSuccess ? NoContent() : result.ToProblem();
+    }
+
+
+    [HttpGet("{orderId}/tracking")]
+    public async Task<IActionResult> GetOrderTracking(int orderId, CancellationToken cancellationToken)
+    {
+        var result = await orderService.GetOrderTrackingAsync(User.GetUserId()!, orderId, cancellationToken);
+
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
     }
 }

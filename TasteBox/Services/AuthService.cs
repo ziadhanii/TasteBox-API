@@ -1,10 +1,6 @@
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
-using TasteBox.Abstractions;
-using TasteBox.Helpers;
 using TasteBox.Helpers.CacheData;
-using TasteBox.Settings;
 
 namespace TasteBox.Services;
 
@@ -29,43 +25,74 @@ public sealed class AuthService(
     public async Task<Result<AuthResponse>> LoginWithGoogleAsync(string idToken,
         CancellationToken cancellationToken = default)
     {
-        var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
-
-        var user = await userManager.FindByEmailAsync(payload.Email);
-
-        if (user is null)
+        try
         {
-            user = new ApplicationUser
+            if (string.IsNullOrWhiteSpace(idToken))
             {
-                Email = payload.Email,
-                UserName = payload.Email.Split('@')[0],
-                FirstName = payload.GivenName ?? "",
-                LastName = payload.FamilyName ?? "",
-                EmailConfirmed = payload.EmailVerified
-            };
+                logger.LogWarning("ID Token is null or empty");
+                return Result.Failure<AuthResponse>(UserErrors.InvalidGoogleToken);
+            }
 
-            var createResult = await userManager.CreateAsync(user);
+            logger.LogInformation("Received ID Token: {TokenStart}...",
+                idToken.Length > 50 ? idToken.Substring(0, 50) : idToken);
 
-            if (!createResult.Succeeded)
-                return Result.Failure<AuthResponse>(CreateIdentityError(createResult).Error);
+            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
 
-            await userManager.AddToRoleAsync(user, DefaultRoles.Customer);
+            logger.LogInformation("Google token validated successfully for user: {Email}", payload.Email);
+
+            var user = await userManager.FindByEmailAsync(payload.Email);
+
+            if (user is null)
+            {
+                user = new ApplicationUser
+                {
+                    Email = payload.Email,
+                    UserName = payload.Email.Split('@')[0],
+                    FirstName = payload.GivenName ?? "",
+                    LastName = payload.FamilyName ?? "",
+                    EmailConfirmed = payload.EmailVerified
+                };
+
+                var createResult = await userManager.CreateAsync(user);
+
+                if (!createResult.Succeeded)
+                    return Result.Failure<AuthResponse>(CreateIdentityError(createResult).Error);
+
+                await userManager.AddToRoleAsync(user, DefaultRoles.Customer);
+                logger.LogInformation("New user created from Google login: {Email}", user.Email);
+            }
+            else
+            {
+                var validationResult = ValidateUserStatus(user);
+
+                if (!validationResult.IsSuccess)
+                    return Result.Failure<AuthResponse>(validationResult.Error);
+
+                if (user.EmailConfirmed || !payload.EmailVerified)
+                    return await GenerateAuthResponseAsync(user, cancellationToken);
+
+                user.EmailConfirmed = true;
+                await userManager.UpdateAsync(user);
+                logger.LogInformation("Existing user logged in via Google: {Email}", user.Email);
+            }
+
+            return await GenerateAuthResponseAsync(user, cancellationToken);
         }
-        else
+        catch (InvalidJwtException ex)
         {
-            var validationResult = ValidateUserStatus(user);
-
-            if (!validationResult.IsSuccess)
-                return Result.Failure<AuthResponse>(validationResult.Error);
-
-            if (user.EmailConfirmed || !payload.EmailVerified)
-                return await GenerateAuthResponseAsync(user, cancellationToken);
-
-            user.EmailConfirmed = true;
-            await userManager.UpdateAsync(user);
+            logger.LogWarning("Invalid Google JWT token: {Error}", ex.Message);
+            return Result.Failure<AuthResponse>(UserErrors.InvalidGoogleToken);
         }
-
-        return await GenerateAuthResponseAsync(user, cancellationToken);
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning("Invalid Google token format: {Error}", ex.Message);
+            return Result.Failure<AuthResponse>(UserErrors.InvalidGoogleToken);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error during Google authentication");
+            return Result.Failure<AuthResponse>(UserErrors.InvalidGoogleToken);
+        }
     }
 
     public async Task<Result> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
@@ -328,6 +355,7 @@ public sealed class AuthService(
             user.Email!,
             user.FirstName,
             user.LastName,
+            user.PhoneNumber ?? "",
             token,
             expiresIn,
             refreshToken,

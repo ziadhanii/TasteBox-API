@@ -1,6 +1,6 @@
 namespace TasteBox.Controllers;
 
-[ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+[ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
 public class RolesController(IRoleService roleService) : APIBaseController
 {
     [HttpGet("")]

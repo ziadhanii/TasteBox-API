@@ -1,7 +1,7 @@
 namespace TasteBox.Controllers;
 
 [Route("api/v1/products/{productId}/stock")]
-[ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+[ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
 public class StockController(IStockService stockService) : ControllerBase
 {
     [HttpGet]

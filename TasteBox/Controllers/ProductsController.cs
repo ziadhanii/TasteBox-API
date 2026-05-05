@@ -5,8 +5,7 @@ namespace TasteBox.Controllers;
 public class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet("")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
-    [HasPermission(Permissions.GetProducts)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     public async Task<IActionResult> GetAll(
         [FromRoute] int categoryId,
         [FromQuery] RequestFilters filters,
@@ -17,8 +16,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
-    [HasPermission(Permissions.GetProducts)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     public async Task<IActionResult> GetById(int categoryId, int id, CancellationToken cancellationToken)
     {
         var result = await productService.GetByIdAsync(categoryId, id, cancellationToken);
@@ -26,7 +24,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpPost]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
     [HasPermission(Permissions.AddProducts)]
     public async Task<IActionResult> CreateProduct([FromRoute] int categoryId, [FromForm] CreateProductRequest request,
         CancellationToken cancellationToken)
@@ -39,7 +37,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
     [HasPermission(Permissions.UpdateProducts)]
     public async Task<IActionResult> UpdateProduct(
         [FromRoute] int categoryId,
@@ -53,7 +51,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 
     [HttpPut("{id}/toggle-status")]
     [HasPermission(Permissions.DeleteProducts)]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Dashboard)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Dashboard)]
     public async Task<IActionResult> ToggleProductStatus(
         [FromRoute] int categoryId,
         [FromRoute] int id,
@@ -65,7 +63,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 
 
     [HttpGet]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     [Route("/api/v1/products/search")]
     public async Task<IActionResult> SearchProducts(
         [FromQuery] string query,
@@ -76,7 +74,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpGet]
-    [ApiExplorerSettings(GroupName = ApiDocuments.Mobile)]
+    [ApiExplorerSettings(GroupName = APIDocuments.Mobile)]
     [Route("/api/v1/products/best-selling")]
     public async Task<IActionResult> GetBestSellingProducts(CancellationToken cancellationToken)
     {

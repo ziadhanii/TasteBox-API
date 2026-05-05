@@ -1,5 +1,3 @@
-using TasteBox.Abstractions;
-
 namespace TasteBox.Extensions;
 
 public static class ResultExtensions

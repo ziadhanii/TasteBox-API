@@ -8,8 +8,8 @@ public static class SwaggerExtensions
 
         app.UseSwaggerUI(c =>
         {
-            c.SwaggerEndpoint($"/swagger/{ApiDocuments.Dashboard}/swagger.json", "Dashboard API");
-            c.SwaggerEndpoint($"/swagger/{ApiDocuments.Mobile}/swagger.json", "Mobile API");
+            c.SwaggerEndpoint($"/swagger/{APIDocuments.Dashboard}/swagger.json", "Dashboard API");
+            c.SwaggerEndpoint($"/swagger/{APIDocuments.Mobile}/swagger.json", "Mobile API");
 
             c.RoutePrefix = string.Empty;
             c.DisplayRequestDuration();

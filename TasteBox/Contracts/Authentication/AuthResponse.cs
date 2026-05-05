@@ -5,6 +5,7 @@ public record AuthResponse(
     string? Email,
     string FirstName,
     string LastName,
+    string PhoneNumber,
     string Token,
     int ExpiresIn,
     string RefreshToken,

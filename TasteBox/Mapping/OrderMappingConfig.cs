@@ -5,7 +5,8 @@ public class OrderMappingConfig : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Order, OrderResponse>()
-            .Map(dest => dest.OrderItems, src => src.OrderItems);
+            .Map(dest => dest.OrderItems, src => src.OrderItems)
+            .Map(dest => dest.Timeline, src => src.GetTimeline());
 
         config.NewConfig<OrderItem, OrderItemResponse>();
 

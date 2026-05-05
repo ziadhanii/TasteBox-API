@@ -1,0 +1,268 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Confirmation - TasteBox</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .header .logo {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            color: #333333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .otp-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .otp-label {
+            font-size: 14px;
+            color: #888888;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .otp-code {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 10px;
+            padding: 20px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        
+        .expiry-notice {
+            background-color: #fff8f5;
+            border-left: 4px solid #ff6b35;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .expiry-notice p {
+            margin: 0;
+            color: #51545e;
+            font-size: 14px;
+        }
+        
+        .expiry-notice strong {
+            color: #ff6b35;
+        }
+        
+        .benefits-box {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .benefits-box h3 {
+            color: #333333;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .benefits-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .benefits-box li {
+            padding: 8px 0;
+            color: #666666;
+            font-size: 14px;
+        }
+        
+        .benefits-box li::before {
+            content: "✓ ";
+            color: #22bc66;
+            font-weight: bold;
+        }
+        
+        .warning-box {
+            background-color: #fef3f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 25px;
+        }
+        
+        .warning-box p {
+            margin: 0;
+            color: #991b1b;
+            font-size: 14px;
+        }
+        
+        .divider {
+            border-top: 1px solid #eaeaec;
+            margin: 30px 0;
+        }
+        
+        .footer {
+            background-color: #f9fafb;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .footer p {
+            color: #9ca3af;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        
+        .footer .brand {
+            color: #ff6b35;
+            font-weight: 600;
+        }
+        
+        .social-links {
+            margin-top: 15px;
+        }
+        
+        .social-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 13px;
+        }
+        
+        .social-links a:hover {
+            color: #ff6b35;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .otp-code {
+                font-size: 28px;
+                letter-spacing: 6px;
+                padding: 15px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">🍽️</div>
+            <h1>TasteBox</h1>
+            <p class="subtitle">Delicious food delivered to your door</p>
+        </div>
+        
+        <div class="content">
+            <p class="greeting">Welcome to TasteBox! 🎉</p>
+            
+            <p class="message">
+                Thank you for signing up! To complete your registration and start ordering 
+                delicious meals, please verify your email address using the code below.
+            </p>
+            
+            <div class="otp-container">
+                <p class="otp-label">Your Verification Code</p>
+                <div class="otp-code">{{OTP}}</div>
+            </div>
+            
+            <div class="expiry-notice">
+                <p>⏱️ This code will expire in <strong>{{ExpirationMinutes}} minutes</strong>.</p>
+            </div>
+            
+            <div class="benefits-box">
+                <h3>What you can do with TasteBox:</h3>
+                <ul>
+                    <li>Browse hundreds of delicious meals</li>
+                    <li>Order from top-rated restaurants</li>
+                    <li>Track your delivery in real-time</li>
+                    <li>Enjoy exclusive member discounts</li>
+                </ul>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="warning-box">
+                <p>🔒 If you didn't create an account with TasteBox, please ignore this email. Someone may have entered your email by mistake.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message from <span class="brand">TasteBox</span>.</p>
+            <p>Please do not reply to this email.</p>
+            <p>&copy; 2026 TasteBox. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#">Facebook</a>
+                <a href="#">Twitter</a>
+                <a href="#">Instagram</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
