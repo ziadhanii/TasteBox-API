@@ -44,3 +44,6 @@ TasteBox/Properties/PublishProfiles/
 # Misc
 PROJECT_DOCUMENTATION.md
 .config
+
+appsettings.Development.json
+*.pubxml.user
